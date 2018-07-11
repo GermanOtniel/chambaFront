@@ -1,0 +1,13 @@
+
+.paperProfile{
+  height: 60vh;
+  width: 85vw;
+  margin-top: 33%;
+}
+.button{
+  display: flex;
+  justify-content: center;
+}
+.input{
+  font-size: 12px
+}
