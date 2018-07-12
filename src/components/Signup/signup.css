@@ -1,13 +1,10 @@
 .login {
     text-align: center;
+    margin-top: 8.5rem
 }
 .paper{
-  height: 50vh;
+  height: 60vh;
   width: 85vw;
   margin: auto;
-}
-
-.login h3 {
-  margin-top: 25%
 }
 

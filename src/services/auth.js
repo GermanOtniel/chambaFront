@@ -15,9 +15,39 @@ export function signup(userData){
         return res.json();
     })
     .then(user=>{
-        //localStorage.setItem('user', JSON.stringify(user))
+        localStorage.setItem('user', JSON.stringify(user))
         return user;
     });
+}
+export function login(userData){
+  //  localhost 
+  // herokuapp  '/auth/login'
+    return fetch( baseURL + '/auth/login' ,{
+      method:'post',
+      headers:{
+        "Content-Type":"application/json"
+      },
+      body:JSON.stringify(userData),
+      credentials: "include"
+    })
+    .then(res=>{
+      if(!res.ok) return Promise.reject(res)
+      return res.json();
+    })
+    .then(user=>{
+      localStorage.setItem('user',JSON.stringify(user));
+      return user;
+    })
+  }
+export function salir(){
+  return fetch( baseURL + '/auth/logout' )
+  .then(res=>{
+    if(!res.ok) return Promise.reject(res.statusText);
+    return 
+  })
+  .then(logoutUser=>{
+    return 'Saliste'
+  })
 }
 export function getSingleUser(id){
   //console.log("peticion");

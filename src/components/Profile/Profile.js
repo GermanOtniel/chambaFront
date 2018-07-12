@@ -9,7 +9,11 @@ import Dialog from 'material-ui/Dialog';
 import RaisedButton from 'material-ui/RaisedButton';
 import AutoComplete from 'material-ui/AutoComplete';
 import { editProfile } from '../../services/auth';
+import {salir} from '../../services/auth';
 import { getCenters } from '../../services/centros';
+import TabSup from './TabSup';
+import FloatingActionButton from 'material-ui/FloatingActionButton';
+import FontIcon from 'material-ui/FontIcon';
 import './profile.css';
 
 const style = {
@@ -20,7 +24,6 @@ const style = {
   display: 'inline-block',
 };
 
-
 class Profile extends Component{
 
   state={
@@ -28,20 +31,20 @@ class Profile extends Component{
     user: {},
     open: false,
     newProfile:{},
-    centers:[]
+    centers:[],
+    centroConsumo:''
   }
-  dataSourceConfig = {
-    text: 'textKey',
-    value: 'valueKey',
-  };
+
   componentWillMount(){
     const id = this.props.match.params.id
     this.setState({id})
    getSingleUser(id)
    .then(user=>{
+     let centroConsumo = user.centroConsumo.nombre;
+     this.setState({centroConsumo})
      this.setState({user})
    })
-   .catch(e=>alert(e));
+   .catch(e=>console.log(e));
    getCenters()
    .then(centers=>{
      this.setState({centers})
@@ -57,7 +60,7 @@ class Profile extends Component{
     //console.log(newProfile)
     this.setState({newProfile}); 
   }
-  onNewRequest(chosenRequest, index) {
+  onNewRequest(chosenRequest) {
     this.setState({
       newProfile: {
         centroConsumo:chosenRequest
@@ -69,13 +72,21 @@ class Profile extends Component{
     const newProfile = this.state.newProfile;
     editProfile(newProfile,id)
     .then(perfilEditado=>{
-      console.log(perfilEditado)
+      this.componentWillMount();
+      this.setState({open:false})
     })
-    .catch(e=>console.log(e))
-    this.componentWillMount();
-    this.setState({open:false})
-    
+    .catch(e=>console.log(e)) 
   }
+  //desloguear al usuario
+  outUser = (e) => {
+    salir()
+    .then(logoutUser=>{
+      console.log(logoutUser)
+      this.props.history.push("/");
+    })
+    .catch(e=>alert(e))
+  }
+// desloguear al usuario
 
   handleOpen = () => {
     this.setState({open: true});
@@ -89,6 +100,7 @@ class Profile extends Component{
 
       return (
         <div className="padreProfile">
+        <TabSup />
         <Paper className="paperProfile" zDepth={5} rounded={false}>
         <ListItem
       disabled={true}
@@ -99,9 +111,8 @@ class Profile extends Component{
           style={style}
         />
       }
-      
-    >
-    </ListItem>
+      >
+      </ListItem>
     <br/>
     <br/>
     <br/>
@@ -109,7 +120,7 @@ class Profile extends Component{
     <h2>Perfil</h2>
     <span>Nombre de Usuario: {user.nombreUsuario}</span>
     <br/>
-    <span>Centro de Consumo: {user.centroConsumo}</span>
+    <span>Centro de Consumo: {this.state.centroConsumo}</span>
     <br/>
     <span>Nombre: {user.nombre}</span>
     <br/>
@@ -117,11 +128,18 @@ class Profile extends Component{
     <br/>
     <span>Correo: {user.correo}</span>
     <br/>
-    <span>Puesto: {user.puesto}</span>
+    <span>Puntos: {user.puntos}</span>
 
         </Paper>
         <div className="button">
+        <div>
         <RaisedButton onClick={this.handleOpen} label="Editar Perfil" primary={true}  />
+        </div>
+        <div className="floating">
+        <FloatingActionButton secondary={true} onClick={this.outUser} >
+          <FontIcon className="material-icons">exit_to_app</FontIcon>
+        </FloatingActionButton>
+        </div>
         <Dialog
           title="Actualiza tu Perfil"
           modal={false}
@@ -151,8 +169,9 @@ class Profile extends Component{
             <Divider />
           </Paper>
           <RaisedButton onClick={this.sendEdit}  label="Actualizar Perfil" secondary={true}  />
+          
+        </Dialog>  
 
-        </Dialog>    
         </div>
         </div>
       );
