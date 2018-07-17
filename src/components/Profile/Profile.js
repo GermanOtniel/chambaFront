@@ -24,6 +24,15 @@ const style = {
   textAlign: 'center',
   display: 'inline-block',
 };
+const styles = {
+ 
+  autoComplete: {
+    display: 'block'
+  },
+  autoHidden: {
+    display: 'none'
+  }
+};
 
 class Profile extends Component{
 
@@ -63,6 +72,7 @@ class Profile extends Component{
   }
   getFile = e => {
     const file = e.target.files[0];
+    console.log(file)
     //aqui lo declaro
     const uploadTask = firebase.storage()
     .ref("testing")
@@ -84,12 +94,10 @@ class Profile extends Component{
     // })
 
   };
-  onNewRequest(chosenRequest) {
-    this.setState({
-      newProfile: {
-        centroConsumo:chosenRequest
-      }
-    })
+  onNewRequest = (chosenRequest) => {
+    const {newProfile} = this.state;
+    newProfile.centroConsumo =  chosenRequest;
+    this.setState({newProfile});
   }
   sendEdit = (e) => {
     const id = this.state.id;
@@ -178,7 +186,8 @@ class Profile extends Component{
       filter={AutoComplete.caseInsensitiveFilter}
       dataSource={this.state.centers.map(centro => centro)}
       dataSourceConfig={ {text: 'nombre', value: '_id'}  }
-      onNewRequest={ this.onNewRequest.bind(this) }
+      onNewRequest={this.onNewRequest}
+      style={!this.state.centroConsumo ? styles.autoComplete : styles.autoHidden }
       />            
           <Divider />
             <TextField onChange={this.onChange} name="nombreUsuario" hintText="Nombre de Usuario" type="text"  underlineShow={false} />
