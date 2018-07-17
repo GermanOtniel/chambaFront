@@ -25,7 +25,7 @@ const TabSup = () =>  (
       
       <Tab
         icon={<FontIcon className="material-icons">info</FontIcon>}
-        label="Información"
+        label="Info"
         containerElement={<Link to="/info"/>}
       />
     </Tabs>

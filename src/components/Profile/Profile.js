@@ -14,6 +14,7 @@ import { getCenters } from '../../services/centros';
 import TabSup from './TabSup';
 import FloatingActionButton from 'material-ui/FloatingActionButton';
 import FontIcon from 'material-ui/FontIcon';
+import firebase from '../../firebase/firebase';
 import './profile.css';
 
 const style = {
@@ -57,9 +58,32 @@ class Profile extends Component{
     const value = e.target.value;
     const {newProfile} = this.state;
     newProfile[field] = value;
-    //console.log(newProfile)
+    console.log(newProfile)
     this.setState({newProfile}); 
   }
+  getFile = e => {
+    const file = e.target.files[0];
+    //aqui lo declaro
+    const uploadTask = firebase.storage()
+    .ref("testing")
+    .child(file.name)
+    .put(file);
+    //aqui agreggo el exito y el error
+    uploadTask
+    .then(r=>{
+      console.log(r.downloadURL)
+      const {newProfile} = this.state;
+      newProfile.fotoPerfil =  r.downloadURL;
+      this.setState({newProfile})
+    })
+    .catch(e=>console.log(e)) //task
+    //aqui reviso el progreso
+    // uploadTask.on('state_changed', (snap)=>{
+    //   const total = (snap.bytesTransferred / snap.totalBytes) * 100;
+    //   this.setState({total});
+    // })
+
+  };
   onNewRequest(chosenRequest) {
     this.setState({
       newProfile: {
@@ -106,7 +130,7 @@ class Profile extends Component{
       disabled={true}
       leftAvatar={
         <Avatar
-          src="http://www.coordinadora.com/wp-content/uploads/sidebar_usuario-corporativo.png"
+          src={user.fotoPerfil}
           size={30}
           style={style}
         />
@@ -165,7 +189,7 @@ class Profile extends Component{
             <Divider />
             <TextField onChange={this.onChange} name="codigoPostal" hintText="Código Postal" type="Codigo Postal"  underlineShow={false} />
             <Divider />
-            <h6>Selecciona una foto para tu perfil</h6> <input className="input" name="profilePic" type="file" />
+            <h6>Selecciona una foto para tu perfil</h6> <input onChange={this.getFile} className="input" name="fotoPerfil" type="file" />
             <Divider />
           </Paper>
           <RaisedButton onClick={this.sendEdit}  label="Actualizar Perfil" secondary={true}  />

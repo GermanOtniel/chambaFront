@@ -18,14 +18,12 @@ class Signup extends Component {
     const value = e.target.value;
     const {newUser} = this.state;
     newUser[field] = value;
-    //console.log(newUser)
     this.setState({newUser}); 
   }
   sendUser = (e) => {
     e.preventDefault();
     signup(this.state.newUser)
     .then(user=>{
-      console.log(user)
       this.props.history.push(`/profile/${user._id}`);
     })
   }
