@@ -5,7 +5,8 @@
 
 # testing
 /coverage
-
+# firebase
+/src/firebase
 # production
 /build
 
