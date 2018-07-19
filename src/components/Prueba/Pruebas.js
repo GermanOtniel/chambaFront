@@ -1,45 +1,58 @@
-import React,{Component} from 'react';
-import Webcam from 'react-webcam';
+import React, { Component } from 'react';
+import { GoogleLogin } from 'react-google-login';
 
+class Pruebas extends Component {
 
-class Pruebas extends Component{
+    
+        state={
+          isAuthenticated: false, 
+          user: null, 
+          token:                ''
+        };
+    
 
-  state={
-    imageSrc:''
-  }
-  setRef = (webcam) => {
-    this.webcam = webcam;
-  }
-
-  capture = () => {
-    const imageSrc = this.webcam.getScreenshot();
-    this.setState({imageSrc});
-  };
-
-  render() {
-    const videoConstraints = {
-      width: 1280,
-      height: 720,
-      facingMode: 'user',
+    logout = () => {
+        this.setState({isAuthenticated: false, token: '', user:    null})
+    };
+    onFailure = (error) => {
+      alert(error);
+    };
+    googleResponse = (response) => {
+        console.log(response);
     };
 
-    return (
-      <div>
-        <Webcam
-          audio={false}
-          height={350}
-          ref={this.setRef}
-          screenshotFormat="image/jpeg"
-          width={350}
-          videoConstraints={videoConstraints}
-        />
-        <button onClick={this.capture}>Capture photo</button>
-        <div>
-          <img src={this.state.imageSrc}/>
-        </div>
-      </div>
-    );
-  }
+    render() {
+        let content = !!this.state.isAuthenticated ?
+            (
+                <div>
+                    <p>Authenticated</p>
+                    <div>
+                        {this.state.user.email}
+                    </div>
+                    <div>
+                        <button onClick={this.logout} className="button">
+                            Log out
+                        </button>
+                    </div>
+                </div>
+            ) :
+            (
+                <div>
+                    <GoogleLogin
+                        clientId="esladelbackend"
+                        buttonText="Login"
+                        onSuccess={this.googleResponse}
+                        onFailure={this.onFailure}
+                    />
+                </div>
+            );
+
+        return (
+            <div className="App">
+                {content}
+            </div>
+        );
+    }
 }
 
 export default Pruebas;

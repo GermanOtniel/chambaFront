@@ -47,7 +47,7 @@ class Login extends Component {
         <h6>Si aún no estás registrado <Link to="/">Regístrate</Link></h6>
         <hr/>
        </form>
-       <button type="button" className="btn btn-danger">Ingresa con Google</button>
+       <a href="http://localhost:3000/auth/google"><button type="button" className="btn btn-danger">Ingresa con Google</button></a>
         </Paper>
        
      </div>

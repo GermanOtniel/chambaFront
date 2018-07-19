@@ -46,7 +46,8 @@ class Profile extends Component{
   }
 
   componentWillMount(){
-    const id = this.props.match.params.id
+    const id = `${JSON.parse(localStorage.getItem('user'))._id}`;
+    console.log('IIIIIIDDDDD', id)
     this.setState({id})
    getSingleUser(id)
    .then(user=>{
@@ -187,7 +188,8 @@ class Profile extends Component{
       dataSource={this.state.centers.map(centro => centro)}
       dataSourceConfig={ {text: 'nombre', value: '_id'}  }
       onNewRequest={this.onNewRequest}
-      style={!this.state.centroConsumo ? styles.autoComplete : styles.autoHidden }
+      style={styles.autoComplete}
+      /*style={!this.state.centroConsumo ? styles.autoComplete : styles.autoHidden }*/
       />            
           <Divider />
             <TextField onChange={this.onChange} name="nombreUsuario" hintText="Nombre de Usuario" type="text"  underlineShow={false} />

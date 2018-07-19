@@ -50,7 +50,7 @@ class Signup extends Component {
         <h6>Si ya estas registrado <Link to="/login">Inicia sesión</Link></h6>
         <hr/>
        </form>
-       <button type="button" className="btn btn-danger">Ingresa con Google</button>
+       <a href="http://localhost:3000/auth/google"><button type="button" className="btn btn-danger">Ingresa con Google</button></a>
         </Paper>
        
      </div>
