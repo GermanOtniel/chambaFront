@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import Paper from 'material-ui/Paper';
 import { login } from '../../services/auth';
 import { Link } from 'react-router-dom';
+import { GoogleLogin } from 'react-google-login';
+import { googleUser } from '../../services/auth';
 import './login.css'
 
 
@@ -10,7 +12,8 @@ import './login.css'
 class Login extends Component {
 
   state={
-    newUser:{}
+    newUser:{},
+    user:{}
   }
 
   onChange = (e) => {
@@ -27,7 +30,21 @@ class Login extends Component {
       this.props.history.push(`/profile/${user._id}`);
     })
   }
-
+  onFailure = (error) => {
+    alert(error);
+  };
+  googleResponse = (response) => {
+      const {user} = this.state;
+      user.nombreUsuario = response.profileObj.name;
+      user.fotoPerfil = response.profileObj.imageUrl;
+      user.correo = response.profileObj.email;
+      user.googleId = response.profileObj.googleId
+      this.setState({user});
+      googleUser(this.state.user)
+          .then(user=>{
+          this.props.history.push(`/profile/${user._id}`);
+  })
+  };
   render() {
     return (
      <div className="login2">
@@ -47,8 +64,16 @@ class Login extends Component {
         <h6>Si aún no estás registrado <Link to="/">Regístrate</Link></h6>
         <hr/>
        </form>
-       <a href="http://localhost:3000/auth/google"><button type="button" className="btn btn-danger">Ingresa con Google</button></a>
-        </Paper>
+       <div>
+        <GoogleLogin
+          clientId=""
+          buttonText="Ingresa con Google"
+          onSuccess={this.googleResponse}
+          onFailure={this.onFailure}
+          className="botonGoogle"
+        />
+        </div>         
+      </Paper>
        
      </div>
     );

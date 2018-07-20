@@ -1,5 +1,24 @@
 const baseURL = 'http://localhost:3000';
 
+export function googleUser(userData){
+  // localhost 
+  //herokuapp '/auth/signup'
+    return fetch(baseURL + '/auth/google', {
+        method:'post',
+        headers:{
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(userData)
+    })
+    .then(res=>{
+        if(!res.ok) return Promise.reject(res);
+        return res.json();
+    })
+    .then(user=>{
+        localStorage.setItem('user', JSON.stringify(user))
+        return user;
+    });
+}
 export function signup(userData){
   // localhost 
   //herokuapp '/auth/signup'

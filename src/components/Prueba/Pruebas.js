@@ -1,12 +1,13 @@
 import React, { Component } from 'react';
 import { GoogleLogin } from 'react-google-login';
+import { googleUser } from '../../services/auth';
 
 class Pruebas extends Component {
 
     
         state={
           isAuthenticated: false, 
-          user: null, 
+          user: {}, 
           token:                ''
         };
     
@@ -18,10 +19,20 @@ class Pruebas extends Component {
       alert(error);
     };
     googleResponse = (response) => {
-        console.log(response);
+        const {user} = this.state;
+        user.nombreUsuario = response.profileObj.name;
+        user.fotoPerfil = response.profileObj.imageUrl;
+        user.correo = response.profileObj.email;
+        user.googleId = response.profileObj.googleId
+        this.setState({user});
+        googleUser(this.state.user)
+            .then(user=>{
+            this.props.history.push(`/profile/${user._id}`);
+    })
     };
 
     render() {
+        const {user} = this.state;
         let content = !!this.state.isAuthenticated ?
             (
                 <div>
@@ -39,7 +50,7 @@ class Pruebas extends Component {
             (
                 <div>
                     <GoogleLogin
-                        clientId="esladelbackend"
+                        clientId="853861088301-d6pp525e5fo1sbd9l1ebv0mogs158ofk.apps.googleusercontent.com"
                         buttonText="Login"
                         onSuccess={this.googleResponse}
                         onFailure={this.onFailure}
@@ -48,6 +59,7 @@ class Pruebas extends Component {
             );
 
         return (
+
             <div className="App">
                 {content}
             </div>
