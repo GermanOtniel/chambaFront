@@ -1,3 +1,7 @@
 .largo{
   height: 100vh;
 }
+
+.dinamicDetailHijo{
+  float: left;
+}

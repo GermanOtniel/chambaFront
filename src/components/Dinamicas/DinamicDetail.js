@@ -8,11 +8,19 @@ import Divider from 'material-ui/Divider';
 import Dialog from 'material-ui/Dialog';
 import RaisedButton from 'material-ui/RaisedButton';
 import TextField from 'material-ui/TextField';
-import Paper from 'material-ui/Paper';
+import Chip from 'material-ui/Chip';
 import Camera from 'react-camera';
 import firebase from '../../firebase/firebase';
 import Checkbox from 'material-ui/Checkbox';
+import Avatar from 'material-ui/Avatar';
+import './dinamica.css';
 
+const styles2 = {
+  wrapper: {
+    display: 'flex',
+    flexWrap: 'wrap',
+  },
+};
 
 const label = {
   color:'white'
@@ -59,49 +67,37 @@ class DinamicDetail extends Component{
     evidencia:{},
     takePhoto: true,
     fotito:"",
-    file:{}
+    file:{},
+    marcas:[]
   }
   
- 
-  // constructor(props) {
-  //   super(props);
-   // this.takePicture = this.takePicture.bind(this);
-  // }
   getFile = e => {
     let file = this.state.file;
     let user = `${JSON.parse(localStorage.getItem('user')).correo}`;
     let fecha = String(file.lastModifiedDate).slice(4,-33);
     //aqui lo declaro
     const uploadTask = firebase.storage()
-    .ref("testing")
+    .ref("evidencias")
     .child( fecha + user +"-"+ file.name)
     .put(file);
     //aqui agreggo el exito y el error
     uploadTask
     .then(r=>{
-      //console.log(r.downloadURL)
       const {evidencia} = this.state;
       evidencia.archivo =  r.downloadURL;
       this.setState({evidencia})
     })
-    .catch(e=>console.log(e+'ERRRRROOOOOR')) //task
-    //aqui reviso el progreso
-    // uploadTask.on('state_changed', (snap)=>{
-    //   const total = (snap.bytesTransferred / snap.totalBytes) * 100;
-    //   this.setState({total});
-    // })
+    .catch(e=>console.log(e+'ERRRRROOOOOR'))
   };
   onCheck = (e) => {
     this.getFile();
   }
   takePicture = () => {
-    //console.log(this.camera.state.mediaStream.active)
     this.setState({takePhoto:false})
     this.camera.capture()
     .then(blob => {
       let archivo = URL.createObjectURL(blob);
       let file = new File([blob], "evidencia.jpg", {type: "image/jpeg", lastModified: Date.now()});
-      console.log(file);
       this.setState({fotito:archivo,file:file})
     })
 
@@ -110,28 +106,29 @@ class DinamicDetail extends Component{
     this.setState({open: true});
   };
   handleClose = () => {
-    this.setState({open: false});
-    this.setState({evidencia:{}});
-    this.setState({takePhoto:true});
+    this.setState({open: false,evidencia:{},takePhoto:true});
   };
   onChange = (e) => {
     const field = e.target.name;
     const value = e.target.value;
     const {evidencia} = this.state;
     evidencia[field] = value;
-    console.log(evidencia)
     this.setState({evidencia}); 
   }
   sendEvidencia = (e) => {
     const idUser = `${JSON.parse(localStorage.getItem('user'))._id}`;
     const idDinamica = this.state.dinamic._id;
     const {evidencia} = this.state;
-    createEvidence(evidencia,idUser,idDinamica)
-    .then(evidence=>{
-      // console.log(evidence)
-      // console.log("IIIIDDDD DINAAAAMIIICCCAAAAA",idDinamica);
+    const {dinamic} = this.state;
+    evidencia.creador = idUser;
+    evidencia.dinamica = idDinamica;
+    evidencia.modalidad = dinamic.modalidad;
+    this.setState({evidencia});
+    createEvidence(this.state.evidencia)
+    .then(evidencia=>{
+      //console.log(evidencia)
     })
-    .catch(e=>console.log(e));
+    .catch(e=>console.log(e))
     this.handleClose();
   }
 
@@ -140,80 +137,117 @@ class DinamicDetail extends Component{
      this.setState({id})
     getSingleDinamic(id)
     .then(dinamic=>{
-      this.setState({dinamic})
+      let marcas =  dinamic.marcas.map(marca=> marca);
+      this.setState({dinamic,marcas})
     })
     .catch(e=>alert(e));
   }
   
+  
   render(){
-    const {dinamic, takePic} = this.state;
+    const {dinamic, marcas} = this.state;
       return (
         <div>
           <TabSup />
-          <Card>
-    <CardHeader
-      title="NOMBRE DE MARCA"
-      avatar="http://cava-alta.com/wp-content/uploads/2016/02/Tecate-logo-300x300.jpg"
-    />
-    <CardMedia
-      overlay={<CardTitle title={dinamic.nombreDinamica} subtitle={dinamic.fechaInicio + " - " + dinamic.fechaFin} />}
-    >
-      <img src={dinamic.imagenPremio} alt="Referencia del premio" />
-    </CardMedia>
-    <CardTitle title="Modalidad:" subtitle={dinamic.modalidad} />
-    <CardText>
-      {dinamic.descripcion}
-    </CardText>
-    <CardActions>
-    <FlatButton onClick={this.handleOpen} label="Participar" fullWidth={true}  backgroundColor="#D62121" labelStyle={label} disableTouchRipple={true}/>
-    </CardActions>
-  </Card>
-
-
-  <Dialog
+          <Card>         
+            <CardMedia
+              overlay={<CardTitle 
+              title={dinamic.nombreDinamica} 
+              subtitle={dinamic.fechaInicio + " - " + dinamic.fechaFin} />}
+            >
+              <img 
+                src={dinamic.imagenPremio} 
+                alt="Referencia del premio" 
+              />
+            </CardMedia>
+            <CardTitle
+              subtitle="Modalidad de la Dinámica" 
+              title={dinamic.modalidad} 
+              
+            />         
+            {marcas.map( (marca, index) => (
+              <Chip
+              key={index}
+              className="dinamicDetailHijo"
+              >
+              <Avatar src={marca.imagen} />
+                {marca.nombre}
+              </Chip> 
+              ))}
+              <br/>
+            <CardText>
+              {dinamic.descripcion}
+            </CardText>
+            <CardActions>
+              <FlatButton 
+                onClick={this.handleOpen} 
+                label="Participar" 
+                fullWidth={true}  
+                backgroundColor="#D62121" 
+                labelStyle={label} 
+                disableTouchRipple={true}
+              />
+            </CardActions>
+          </Card>
+        <Dialog
           title="Envia tu evidencia"
           modal={false}
           open={this.state.open}
           onRequestClose={this.handleClose}
+          autoScrollBodyContent={true}
         >
-
-          
-          <Paper   zDepth={2}>
             <Camera
-          style={this.state.takePhoto ? style.preview : style.hiddenImage }
-          ref={(cam) => {
-            this.camera = cam;
-          }}
-        >
-          <div style={style.captureContainer} onClick={this.takePicture}>
-            <div style={style.captureButton} />
-          </div>
-        </Camera>
-        
-        <img
-          style={style.captureImage }
-          ref={(img) => {
-            this.img = img;
-          }}
-        />
-        <img style={!this.state.takePhoto ? style.captureImage : style.hiddenImage }
- src={this.state.fotito}/>
-          <Divider />
-          <Checkbox
-          label="¿Usaras esa foto?"
-          style={!this.state.takePhoto ? style.checkbox : style.hiddenImage }
-          onCheck={this.onCheck}
-          />
-          <TextField style={style.textField} onChange={this.onChange} name="mensaje" hintText="Aqui va tu mensaje" type="text"  underlineShow={false} />
-          <TextField onChange={this.onChange} name="cantidadProducto" hintText="Cantidad" type="number"  underlineShow={false} />
-          </Paper>
-          
-
-
-          <RaisedButton onClick={this.sendEvidencia}  label="Enviar" secondary={true}  />
+              style={this.state.takePhoto ? style.preview : style.hiddenImage }
+              ref={(cam) => {
+                this.camera = cam;
+              }}
+            >
+              <div style={style.captureContainer} onClick={this.takePicture}>
+                <div style={style.captureButton}>
+                </div >
+              </div>
+            </Camera>
+            <img
+              style={style.captureImage }
+              ref={(img) => {
+              this.img = img;
+              }}
+            />
+            <img 
+              style={!this.state.takePhoto ? style.captureImage : style.hiddenImage }
+              src={this.state.fotito}/>
+            <Divider />
+            <Checkbox
+              label="¿Usaras esa foto?"
+              style={!this.state.takePhoto ? style.checkbox : style.hiddenImage }
+              onCheck={this.onCheck}
+            />
+            <TextField
+              style={style.textField} 
+              onChange={this.onChange} 
+              name="mensaje" 
+              floatingLabelText="Mensaje"
+              multiLine={true}
+              hintText="Aqui va tu mensaje" 
+              type="text"  
+              underlineShow={false} 
+            />
+            <TextField 
+              onChange={this.onChange} 
+              name="cantidadProducto"
+              floatingLabelText="Producto Vendido" 
+              hintText="Cantidad" 
+              type="number"  
+              underlineShow={false} 
+            />
+            <RaisedButton 
+              onClick={this.sendEvidencia}  
+              label="Enviar" 
+              secondary={true}  
+            />
           
         </Dialog> 
-        </div>
+      </div>
       );
     }
     
