@@ -15,7 +15,7 @@ const styles = {
   },
   gridList: {
     width: 500,
-    height: 580,
+    height: 370,
     overflowY: 'auto',
   },
 };
@@ -49,7 +49,7 @@ class Dinamica extends Component{
         <GridTile
           key={dinamic.imagenPremio}
           title={dinamic.nombreDinamica}
-          subtitle={<b>{dinamic.fechaInicio} <br/>Centro:  {dinamic.modalidad}</b>}
+          subtitle={<b>{dinamic.fechaInicio} <br/>Modalidad:  {dinamic.modalidad}</b>}
           actionIcon={<Link to={`/dinamica/${dinamic._id}`} ><IconButton><FontIcon color="white" className="material-icons">pageview</FontIcon></IconButton></Link>}
         >
           <img src={dinamic.imagenPremio} />

@@ -69,10 +69,12 @@ class DinamicDetail extends Component{
   // }
   getFile = e => {
     let file = this.state.file;
+    let user = `${JSON.parse(localStorage.getItem('user')).correo}`;
+    let fecha = String(file.lastModifiedDate).slice(4,-33);
     //aqui lo declaro
     const uploadTask = firebase.storage()
     .ref("testing")
-    .child( file.lastModifiedDate + file.name)
+    .child( fecha + user +"-"+ file.name)
     .put(file);
     //aqui agreggo el exito y el error
     uploadTask

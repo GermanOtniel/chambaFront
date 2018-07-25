@@ -47,13 +47,11 @@ class Profile extends Component{
 
   componentWillMount(){
     const id = `${JSON.parse(localStorage.getItem('user'))._id}`;
-    console.log('IIIIIIDDDDD', id)
     this.setState({id})
    getSingleUser(id)
    .then(user=>{
      let centroConsumo = user.centroConsumo.nombre;
-     this.setState({centroConsumo})
-     this.setState({user})
+     this.setState({user,centroConsumo})
    })
    .catch(e=>console.log(e));
    getCenters()
@@ -93,7 +91,6 @@ class Profile extends Component{
     //   const total = (snap.bytesTransferred / snap.totalBytes) * 100;
     //   this.setState({total});
     // })
-
   };
   onNewRequest = (chosenRequest) => {
     const {newProfile} = this.state;
@@ -104,9 +101,9 @@ class Profile extends Component{
     const id = this.state.id;
     const newProfile = this.state.newProfile;
     editProfile(newProfile,id)
-    .then(perfilEditado=>{
-      this.componentWillMount();
-      this.setState({open:false})
+    .then(user=>{
+      this.handleClose();
+      this.setState({open:false,user})
     })
     .catch(e=>console.log(e)) 
   }

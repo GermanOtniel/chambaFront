@@ -36,7 +36,6 @@ class Signup extends Component {
   googleResponse = (response) => {
       const {user} = this.state;
       user.nombreUsuario = response.profileObj.name;
-      user.fotoPerfil = response.profileObj.imageUrl;
       user.correo = response.profileObj.email;
       user.googleId = response.profileObj.googleId
       this.setState({user});
@@ -69,7 +68,7 @@ class Signup extends Component {
        </form>
        <div>
         <GoogleLogin
-          clientId=""
+          clientId="853861088301-d6pp525e5fo1sbd9l1ebv0mogs158ofk.apps.googleusercontent.com"
           buttonText="Ingresa con Google"
           onSuccess={this.googleResponse}
           onFailure={this.onFailure}
