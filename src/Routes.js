@@ -7,6 +7,9 @@ import Dinamica from './components/Dinamicas/Dinamicas';
 import DinamicDetail from './components/Dinamicas/DinamicDetail';
 import Pruebas from './components/Prueba/Pruebas';
 import Camara from './components/Prueba/Camara';
+import Menu from './components/Menu/Menu';
+import Puntos from './components/Puntos/Puntos';
+import Ventas from './components/Ventas/Ventas';
 
 
 export const Routes = () => {
@@ -17,6 +20,9 @@ export const Routes = () => {
       <Route path="/login" component={Login}/>
       <Route path="/dinamicas" component={Dinamica}/>
       <Route path="/dinamica/:id" component={DinamicDetail}/>
+      <Route path="/menu" component={Menu}/>
+      <Route path="/puntos" component={Puntos}/>
+      <Route path="/ventas" component={Ventas}/>
       <Route path="/pruebas" component={Pruebas}/>
       <Route path="/camara" component={Camara}/>
     </Switch>

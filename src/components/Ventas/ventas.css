@@ -1,0 +1,13 @@
+.bloques{
+  width:100%;
+  height:11rem; 
+  padding:20px;
+  background-color: rgb(195, 226, 226); 
+  display: 
+}
+
+.bloques > button {
+  background-color: crimson;
+  color: white;
+  float: right;
+}

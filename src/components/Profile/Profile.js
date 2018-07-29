@@ -158,7 +158,8 @@ class Profile extends Component{
     <br/>
     <span>Correo: {user.correo}</span>
     <br/>
-    <span>Puntos: {user.puntos}</span>
+    <span>Puntos: {user.calificacion}</span>
+
 
         </Paper>
         <div className="button">

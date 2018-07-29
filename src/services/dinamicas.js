@@ -21,3 +21,19 @@ export function getSingleDinamic(id) {
     return dinamic
   })
 }
+export function sendWinner(dinamica,id){
+  return fetch(baseURL + '/dinamica/winner/' + id , {
+      method:'post',
+      headers:{
+          "Content-Type": "application/json"
+      },
+      body: JSON.stringify(dinamica)
+  })
+  .then(res=>{
+      if(!res.ok) return Promise.reject(res);
+      return res.json();
+  })
+  .then(dinamica=>{
+      return dinamica;
+  });
+}

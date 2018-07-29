@@ -9,12 +9,12 @@ const TabSup = () =>  (
       <Tabs>
       <Tab
         icon={<FontIcon className="material-icons">home</FontIcon>}
-        label="Mi perfil"
+        label="Perfil"
         containerElement={<Link to={`/profile/${JSON.parse(localStorage.getItem('user'))._id}`}/>}
       />
       <Tab
         icon={<FontIcon className="material-icons">notification_important</FontIcon>}
-        label="Dinamicas"
+        label="Nuevo"
         containerElement={<Link to="/dinamicas"/>}
       />
       <Tab
@@ -22,11 +22,10 @@ const TabSup = () =>  (
         label="Market"
         containerElement={<Link to="/market"/>}
       />
-      
       <Tab
-        icon={<FontIcon className="material-icons">info</FontIcon>}
-        label="Info"
-        containerElement={<Link to="/info"/>}
+        icon={<FontIcon className="material-icons">menu</FontIcon>}
+        label="Menu"
+        containerElement={<Link to="/menu"/>}
       />
     </Tabs>
     </div>
