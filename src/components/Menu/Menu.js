@@ -18,11 +18,7 @@ class Menu extends Component{
           <div>
           <TabSup />
           </div>
-          <div className="menu-container">
-            <div>
-            <Link to="/puntos"><RaisedButton style={{height:50}} labelColor="#FAFAFA" backgroundColor="#546E7A"	 label="PUNTOS" fullWidth={true}></RaisedButton></Link>
-            </div>
-          </div> 
+          
           <div className="menu-container"> 
             <div>
             <Link to="/ventas"><RaisedButton style={{height:50}} labelColor="#FAFAFA" backgroundColor="#546E7A" label="VENTAS" fullWidth={true}></RaisedButton></Link>
@@ -40,7 +36,7 @@ class Menu extends Component{
           </div> 
           <div className="menu-container"> 
             <div>
-            <RaisedButton href="http://1puntocinco.com/" style={{height:50}} labelColor="#FAFAFA"	 backgroundColor="#546E7A" label="UNIVERSO 1.5" fullWidth={true} ></RaisedButton>
+            <RaisedButton href="http://1puntocinco.com/" style={{height:50}} labelColor="#FAFAFA"	 backgroundColor="#546E7A" label="ACADEMIA 1.5" fullWidth={true} ></RaisedButton>
             </div> 
           </div> 
              

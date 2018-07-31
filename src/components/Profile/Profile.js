@@ -46,6 +46,7 @@ class Profile extends Component{
   }
 
   componentWillMount(){
+    console.log(this.props)
     const id = `${JSON.parse(localStorage.getItem('user'))._id}`;
     this.setState({id})
    getSingleUser(id)
