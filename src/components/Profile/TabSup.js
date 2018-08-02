@@ -2,11 +2,14 @@ import React from 'react';
 import {Tabs, Tab} from 'material-ui/Tabs';
 import FontIcon from 'material-ui/FontIcon';
 import { Link } from 'react-router-dom';
+import './profile.css';
 
 
 const TabSup = () =>  (
       <div>
-      <Tabs>
+      <Tabs
+      tabItemContainerStyle={{background: '#d8ce3a'}} 
+      >
       <Tab
         icon={<FontIcon className="material-icons">home</FontIcon>}
         label="Perfil"

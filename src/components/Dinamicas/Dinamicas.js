@@ -27,6 +27,7 @@ class Dinamica extends Component{
   componentWillMount(){
    getDinamics()
    .then(dinamics=>{
+     console.log(dinamics)
      this.setState({dinamics})
    })
    .catch(e=>alert(e))

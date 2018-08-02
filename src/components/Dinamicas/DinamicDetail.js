@@ -8,20 +8,23 @@ import Divider from 'material-ui/Divider';
 import Dialog from 'material-ui/Dialog';
 import RaisedButton from 'material-ui/RaisedButton';
 import TextField from 'material-ui/TextField';
-import Chip from 'material-ui/Chip';
 import Camera from 'react-camera';
 import firebase from '../../firebase/firebase';
 import Checkbox from 'material-ui/Checkbox';
 import Avatar from 'material-ui/Avatar';
+import Chip from 'material-ui/Chip';
 import './dinamica.css';
 
+
 const styles2 = {
+  chip: {
+    margin: 4,
+  },
   wrapper: {
     display: 'flex',
     flexWrap: 'wrap',
   },
 };
-
 const label = {
   color:'white'
 }
@@ -40,10 +43,10 @@ const style = {
   captureButton: {
     backgroundColor: '#fff',
     borderRadius: '50%',
-    height: 56,
-    width: 56,
+    height: 30,
+    width: 30,
     color: '#000',
-    margin: 20
+    margin: 7
   },
   captureImage: {
     width: '100%',
@@ -68,7 +71,8 @@ class DinamicDetail extends Component{
     takePhoto: true,
     fotito:"",
     file:{},
-    marcas:[]
+    marcas:[],
+    chipData:[]
   }
   
   getFile = e => {
@@ -108,6 +112,20 @@ class DinamicDetail extends Component{
   handleClose = () => {
     this.setState({open: false,evidencia:{},takePhoto:true});
   };
+  onChangeEvidence = (e) => {
+    const field = e.target.name;
+    const value = e.target.value;
+    const {chipData} =this.state;
+    const {evidencia} = this.state;
+    for(let i = 0; i<chipData.length;i++){
+      if(field === chipData[i]._id._id){
+        chipData[i].ventas = value
+      }
+    }
+    evidencia.marcas = chipData;
+    console.log(evidencia)
+    this.setState({evidencia,chipData})
+  }
   onChange = (e) => {
     const field = e.target.name;
     const value = e.target.value;
@@ -137,12 +155,32 @@ class DinamicDetail extends Component{
      this.setState({id})
     getSingleDinamic(id)
     .then(dinamic=>{
-      let marcas =  dinamic.marcas.map(marca=> marca);
-      this.setState({dinamic,marcas})
+      console.log(dinamic)
+      let marcas = dinamic.marcaPuntosVentas.map(marca=> marca);
+      let chipData = marcas
+      this.setState({dinamic,marcas,chipData})
     })
     .catch(e=>alert(e));
   }
-  
+  renderChip(data) {
+    return (
+     <div key={data._id.nombre}>
+      <Chip
+       style={styles2.chip}
+      >
+      <Avatar src={data._id.imagen} />
+        {data._id.nombre}
+      </Chip>
+      <TextField
+      onChange={this.onChangeEvidence}
+      name={`${data._id._id}`}
+      type="number"
+      hintText="Ventas por Marca"
+    />
+    <hr/>
+      </div>
+    );
+  }
   
   render(){
     const {dinamic, marcas} = this.state;
@@ -153,7 +191,7 @@ class DinamicDetail extends Component{
             <CardMedia
               overlay={<CardTitle 
               title={dinamic.nombreDinamica} 
-              subtitle={dinamic.fechaInicio + " - " + dinamic.fechaFin} />}
+              subtitle={<b className="bSubtitle"> {dinamic.fechaInicio + " - " + dinamic.fechaFin}</b>} />}
             >
               <img 
                 src={dinamic.imagenPremio} 
@@ -164,17 +202,24 @@ class DinamicDetail extends Component{
               subtitle="Modalidad de la Dinámica" 
               title={dinamic.modalidad} 
               
-            />         
+            />    
+            <hr/>
+            <b>{dinamic.modalidad === "Ventas" ? "Ventas requeridas por marca: " : "Puntos por unidad vendida: "}</b>     
+            <br/><br/>
             {marcas.map( (marca, index) => (
+              <div key={index}>
               <Chip
-              key={index}
               className="dinamicDetailHijo"
               >
-              <Avatar src={marca.imagen} />
-                {marca.nombre}
+              <Avatar src={marca._id.imagen} />
+                {marca._id.nombre}
+                 <b>{dinamic.modalidad === "Ventas" ? " " + marca.puntosVentas + " ventas" : " " + marca.puntosVentas + " puntos" }</b> 
               </Chip> 
+              <br/><br/>
+              </div>
               ))}
-              <br/>
+              <hr/>
+              <b>Descripción de la Dinámica:</b>
             <CardText>
               {dinamic.descripcion}
             </CardText>
@@ -232,14 +277,11 @@ class DinamicDetail extends Component{
               type="text"  
               underlineShow={false} 
             />
-            <TextField 
-              onChange={this.onChange} 
-              name="cantidadProducto"
-              floatingLabelText="Producto Vendido" 
-              hintText="Cantidad" 
-              type="number"  
-              underlineShow={false} 
-            />
+            <hr/>
+            <h6>Define cuantas ventas hiciste de cada marca:</h6>
+            <div style={styles2.wrapper}>
+              {this.state.chipData.map(this.renderChip, this)}
+            </div>
             <RaisedButton 
               onClick={this.sendEvidencia}  
               label="Enviar" 
