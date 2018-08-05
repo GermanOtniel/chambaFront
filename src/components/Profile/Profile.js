@@ -46,7 +46,6 @@ class Profile extends Component{
   }
 
   componentWillMount(){
-    console.log(this.props)
     const id = `${JSON.parse(localStorage.getItem('user'))._id}`;
     this.setState({id})
    getSingleUser(id)
@@ -67,12 +66,10 @@ class Profile extends Component{
     const value = e.target.value;
     const {newProfile} = this.state;
     newProfile[field] = value;
-    console.log(newProfile)
     this.setState({newProfile}); 
   }
   getFile = e => {
     const file = e.target.files[0];
-    console.log(file)
     //aqui lo declaro
     const uploadTask = firebase.storage()
     .ref("testing")
