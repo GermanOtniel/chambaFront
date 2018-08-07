@@ -1,11 +1,17 @@
+.app2{
+  width: 100%;
+  height: auto;
+  background-size: 100%;
+  background-image: url('https://firebasestorage.googleapis.com/v0/b/filetest-210500.appspot.com/o/testing%2Fpin%CC%83ita15.jpg?alt=media&token=788bba77-ee8f-40f2-8c09-0ff5ddcac466')
+}
 .login {
     text-align: center;
-    margin-top: 8.5rem
+    display: flex;
 }
 .paper{
   height: 60vh;
   width: 85vw;
-  margin: auto;
+  margin: 40% auto;
 }
 .botonGoogle{
   background-color: rgb(214, 6, 6);

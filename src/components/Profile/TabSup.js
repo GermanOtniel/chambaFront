@@ -8,7 +8,8 @@ import './profile.css';
 const TabSup = () =>  (
       <div>
       <Tabs
-      tabItemContainerStyle={{background: '#d8ce3a'}} 
+      tabItemContainerStyle={{background: '#bc960b'}} 
+      //#bc960b
       >
       <Tab
         icon={<FontIcon className="material-icons">home</FontIcon>}
@@ -20,11 +21,11 @@ const TabSup = () =>  (
         label="Nuevo"
         containerElement={<Link to="/dinamicas"/>}
       />
-      <Tab
+      {/* <Tab
         icon={<FontIcon className="material-icons">store_mall_directory</FontIcon>}
         label="Market"
-        containerElement={<Link to="/market"/>}
-      />
+        containerElement={<Link to="/menu"/>}
+      /> */}
       <Tab
         icon={<FontIcon className="material-icons">menu</FontIcon>}
         label="Menu"

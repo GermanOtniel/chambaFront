@@ -9,6 +9,8 @@ import Dialog from 'material-ui/Dialog';
 import RaisedButton from 'material-ui/RaisedButton';
 import TextField from 'material-ui/TextField';
 import Camera from 'react-camera';
+import {green700,blue500} from 'material-ui/styles/colors';
+import LinearProgress from 'material-ui/LinearProgress';
 import firebase from '../../firebase/firebase';
 import Checkbox from 'material-ui/Checkbox';
 import Avatar from 'material-ui/Avatar';
@@ -24,6 +26,23 @@ const styles2 = {
     display: 'flex',
     flexWrap: 'wrap',
   },
+  uploadInput: {
+    cursor: 'pointer',
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    right: 0,
+    left: 0,
+    width: '100%',
+    opacity: 0,
+  },
+  errorStyle: {
+    color: green700,
+  },
+  floatingLabelFocusStyle: {
+    color: blue500,
+  }
+  
 };
 const label = {
   color:'white'
@@ -72,7 +91,8 @@ class DinamicDetail extends Component{
     fotito:"",
     file:{},
     marcas:[],
-    chipData:[]
+    chipData:[],
+    progresoImagen:0,
   }
   
   getFile = e => {
@@ -92,6 +112,11 @@ class DinamicDetail extends Component{
       this.setState({evidencia})
     })
     .catch(e=>console.log(e+'ERRRRROOOOOR'))
+    uploadTask.on('state_changed', (snap)=>{
+      const progresoImagen = (snap.bytesTransferred / snap.totalBytes) * 100;
+      this.setState({progresoImagen});
+      console.log(this.state.progresoImagen)
+    })
   };
   onCheck = (e) => {
     this.getFile();
@@ -176,6 +201,10 @@ class DinamicDetail extends Component{
       name={`${data._id._id}`}
       type="number"
       hintText="Ventas por Marca"
+      floatingLabelStyle={styles2.floatingLabelFocusStyle}
+      floatingLabelFocusStyle={styles2.floatingLabelFocusStyle}
+      errorText="Este campo es obligatorio"
+      errorStyle={styles2.errorStyle} 
     />
     <hr/>
       </div>
@@ -183,7 +212,7 @@ class DinamicDetail extends Component{
   }
   
   render(){
-    const {dinamic, marcas} = this.state;
+    const {dinamic, marcas,takePhoto} = this.state;
       return (
         <div>
           <TabSup />
@@ -242,7 +271,7 @@ class DinamicDetail extends Component{
           autoScrollBodyContent={true}
         >
             <Camera
-              style={this.state.takePhoto ? style.preview : style.hiddenImage }
+              style={takePhoto ? style.preview : style.hiddenImage }
               ref={(cam) => {
                 this.camera = cam;
               }}
@@ -267,15 +296,23 @@ class DinamicDetail extends Component{
               style={!this.state.takePhoto ? style.checkbox : style.hiddenImage }
               onCheck={this.onCheck}
             />
+            <br/>
+             <LinearProgress mode="determinate" value={this.state.progresoImagen} />
+          <span>{this.state.progresoImagen >= 100 ? "Listo tu imagen se ha cargado correctamente!" : ""}</span>
+         
+            <br/><br/><br/><br/>
             <TextField
               style={style.textField} 
               onChange={this.onChange} 
               name="mensaje" 
               floatingLabelText="Mensaje"
               multiLine={true}
-              hintText="Aqui va tu mensaje" 
               type="text"  
-              underlineShow={false} 
+              underlineShow={true}
+              floatingLabelStyle={styles2.floatingLabelFocusStyle}
+              floatingLabelFocusStyle={styles2.floatingLabelFocusStyle}
+              errorText="Este campo no es obligatorio"
+              errorStyle={styles2.errorStyle} 
             />
             <hr/>
             <h6>Define cuantas ventas hiciste de cada marca:</h6>

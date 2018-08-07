@@ -1,9 +1,15 @@
+.app{
+  width: 100%;
+  height: auto;
+  background-size: 100%;
+  background-image: url('https://firebasestorage.googleapis.com/v0/b/filetest-210500.appspot.com/o/testing%2Fpin%CC%83ita15.jpg?alt=media&token=788bba77-ee8f-40f2-8c09-0ff5ddcac466')
+}
 .login2 {
   text-align: center;
-  margin-top: 8.5rem
+  display: flex
 }
 .paper2{
 height: 55vh;
 width: 85vw;
-margin: auto;
+margin: 40% auto;
 }

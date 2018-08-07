@@ -4,11 +4,25 @@ import Dialog from 'material-ui/Dialog';
 import FlatButton from 'material-ui/FlatButton';
 import {Link} from 'react-router-dom';
 import RaisedButton from 'material-ui/RaisedButton';
+import Avatar from 'material-ui/Avatar';
+import Paper from 'material-ui/Paper';
 import { getVentas } from '../../services/ventas';
-import { sendWinner } from '../../services/dinamicas'
+import { sendWinner } from '../../services/dinamicas';
+import Chip from 'material-ui/Chip';
 import './ventas.css';
 
 
+const style = {
+  height: 100,
+  width: '100%',
+  margin: 20,
+  textAlign: 'center',
+  display: 'inline-block',
+};
+const style2 = {
+  margin: 5,
+  float: 'right'
+};
 
 
 class Ventas extends Component{
@@ -69,12 +83,14 @@ class Ventas extends Component{
             if(newArray[f].marcaPuntosVentas[b]._id === newArray[f].ventas[n]._id._id){
               newArray[f].marcaPuntosVentas[b].puntosUsuario += newArray[f].ventas[n].ventas
               newArray[f].marcaPuntosVentas[b].nombre = newArray[f].ventas[n]._id.nombre
+              newArray[f].marcaPuntosVentas[b].foto = newArray[f].ventas[n]._id.imagen
             }
           }
         }
       }
 // HASTA AQUI newArray LLEVA LAS DINAMICAS UNICAS JUNTO CON LAS VENTAS QUE LE 
 //CORRESPONDE A CADA UNA Y TAMBIEN YA VAN SUMADAS ESAS VENTAS POR PRODUCTO.
+console.log(newArray)
       this.setState({newArray})
     })
     .catch(e=>console.log(e))
@@ -112,7 +128,7 @@ class Ventas extends Component{
           <div>
           <TabSup />
           </div>
-          <div>
+          {/* <div>
           {newArray.map((dinamic)=>(
             <div key={dinamic._id} className="bloques">
               <hr className="hrVentas"/>
@@ -129,7 +145,47 @@ class Ventas extends Component{
               </div>
           </div>
           ))} 
+          </div> */}
+
+
+
+          <div>
+          {newArray.map((dinamic)=>(
+              <Paper key={dinamic._id} className="paperVentas" zDepth={3} rounded={false}>
+              <hr className="hrVentas"/>
+              <Avatar
+                src={dinamic.imagenPremio}
+                size={90}
+                style={style2}
+              />
+              <b>Nombre de la Dinámica:</b>
+              <h4>{dinamic.nombreDinamica}</h4>
+              <h6 className="ache6">Ventas: </h6> {dinamic.marcaPuntosVentas.sort((a, b) => b.puntosUsuario - a.puntosUsuario ).map((marca,index)=>(
+                <div className="ventas" key={index}>
+                <hr/>
+                <Chip
+                className="dinamicDetailHijo"
+                >
+                <Avatar src={marca.foto} />
+                  {marca.nombre}
+                </Chip>
+                <br/> 
+                <br/> 
+                <p>Meta de Ventas: <big>{marca.puntosVentas}</big> </p>
+                <p>Ventas Logradas: <big className="bigVentas">{marca.puntosUsuario}</big> </p>
+                {marca.puntosUsuario >= marca.puntosVentas ? dinamic.ganador = true : dinamic.ganador = false}
+                <hr/>
+                </div>
+              ))}
+              <div className="buttonVentas">
+              <button style={dinamic.ganador === true ? {display:"block"} : {display:"none"} } onClick={() => this.oneWinner(dinamic)}>Reclamar premio</button>
+              </div>
+              </Paper>
+          ))} 
           </div>
+          
+
+
           <div>
           <Dialog
           title="¡GANASTE!"

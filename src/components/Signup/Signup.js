@@ -46,7 +46,8 @@ class Signup extends Component {
   };
   render() {
     return (
-     <div className="login">
+      <div className="app2">
+<div className="login">
       <Paper className="paper" zDepth={5}>
        <form>
          <div className="form-group">
@@ -78,6 +79,8 @@ class Signup extends Component {
       </Paper>
        
      </div>
+      </div>
+     
     );
   }
 }

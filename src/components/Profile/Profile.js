@@ -10,8 +10,11 @@ import RaisedButton from 'material-ui/RaisedButton';
 import AutoComplete from 'material-ui/AutoComplete';
 import { editProfile } from '../../services/auth';
 import {salir} from '../../services/auth';
+import {green700,blue500} from 'material-ui/styles/colors';
+import LinearProgress from 'material-ui/LinearProgress';
 import { getCenters } from '../../services/centros';
 import TabSup from './TabSup';
+import FlatButton from 'material-ui/FlatButton';
 import FloatingActionButton from 'material-ui/FloatingActionButton';
 import FontIcon from 'material-ui/FontIcon';
 import firebase from '../../firebase/firebase';
@@ -31,6 +34,22 @@ const styles = {
   },
   autoHidden: {
     display: 'none'
+  },
+  errorStyle: {
+    color: green700,
+  },
+  floatingLabelFocusStyle: {
+    color: blue500,
+  },
+  uploadInput: {
+    cursor: 'pointer',
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    right: 0,
+    left: 0,
+    width: '100%',
+    opacity: 0,
   }
 };
 
@@ -42,7 +61,8 @@ class Profile extends Component{
     open: false,
     newProfile:{},
     centers:[],
-    centroConsumo:''
+    centroConsumo:'',
+    progresoImagen:0
   }
 
   componentWillMount(){
@@ -72,7 +92,7 @@ class Profile extends Component{
     const file = e.target.files[0];
     //aqui lo declaro
     const uploadTask = firebase.storage()
-    .ref("testing")
+    .ref("users")
     .child(file.name)
     .put(file);
     //aqui agreggo el exito y el error
@@ -84,11 +104,11 @@ class Profile extends Component{
       this.setState({newProfile})
     })
     .catch(e=>console.log(e)) //task
-    //aqui reviso el progreso
-    // uploadTask.on('state_changed', (snap)=>{
-    //   const total = (snap.bytesTransferred / snap.totalBytes) * 100;
-    //   this.setState({total});
-    // })
+    uploadTask.on('state_changed', (snap)=>{
+      const progresoImagen = (snap.bytesTransferred / snap.totalBytes) * 100;
+      this.setState({progresoImagen});
+      console.log(this.state.progresoImagen)
+    })
   };
   onNewRequest = (chosenRequest) => {
     const {newProfile} = this.state;
@@ -109,7 +129,6 @@ class Profile extends Component{
   outUser = (e) => {
     salir()
     .then(logoutUser=>{
-      console.log(logoutUser)
       this.props.history.push("/");
     })
     .catch(e=>alert(e))
@@ -120,7 +139,7 @@ class Profile extends Component{
     this.setState({open: true});
   };
   handleClose = () => {
-    this.setState({open: false});
+    this.setState({open: false,progresoImagen:0});
   };
 
   render(){
@@ -139,6 +158,9 @@ class Profile extends Component{
           style={style}
         />
       }
+      rightAvatar={<FloatingActionButton secondary={true} onClick={this.outUser} >
+      <FontIcon className="material-icons">exit_to_app</FontIcon>
+    </FloatingActionButton>}
       >
       </ListItem>
     <br/>
@@ -146,59 +168,76 @@ class Profile extends Component{
     <br/>
     <br/>
     <h2>Perfil</h2>
-    <span>Nombre de Usuario: {user.nombreUsuario}</span>
+    <span>Nombre de Usuario: </span><br/> <b>{user.nombreUsuario}</b>
     <br/>
-    <span>Centro de Consumo: {this.state.centroConsumo}</span>
+    <span>Centro de Consumo: </span><br/><b>{this.state.centroConsumo}</b>
     <br/>
-    <span>Nombre: {user.nombre}</span>
+    <span>Nombre: </span> <br/> <b>{user.nombre + ' ' + user.apellido}</b>
     <br/>
-    <span>Apellido: {user.apellido}</span>
+    <span>Correo: </span> <br/> <b>{user.correo}</b>
     <br/>
-    <span>Correo: {user.correo}</span>
-    <br/>
-    <span>Puntos: {user.calificacion}</span>
+    <h4>Puntos: {user.calificacion}</h4>
 
-
-        </Paper>
-        <div className="button">
+        <hr/>
         <div>
         <RaisedButton onClick={this.handleOpen} label="Editar Perfil" primary={true}  />
         </div>
-        <div className="floating">
-        <FloatingActionButton secondary={true} onClick={this.outUser} >
-          <FontIcon className="material-icons">exit_to_app</FontIcon>
-        </FloatingActionButton>
-        </div>
+       <br/>
+        </Paper>
+        <div className="button">
         <Dialog
           title="Actualiza tu Perfil"
           modal={false}
           open={this.state.open}
           onRequestClose={this.handleClose}
+          autoScrollBodyContent={true}      
         >
 
 
-          <Paper  zDepth={2}>
+          
           <AutoComplete
-      floatingLabelText="Type 'r', case insensitive"
-      filter={AutoComplete.caseInsensitiveFilter}
-      dataSource={this.state.centers.map(centro => centro)}
-      dataSourceConfig={ {text: 'nombre', value: '_id'}  }
-      onNewRequest={this.onNewRequest}
-      style={styles.autoComplete}
-      /*style={!this.state.centroConsumo ? styles.autoComplete : styles.autoHidden }*/
-      />            
+            floatingLabelText="Elige tu Centro de Consumo"
+            hintText="En el que trabajas"
+            filter={AutoComplete.caseInsensitiveFilter}
+            dataSource={this.state.centers.map(centro => centro)}
+            dataSourceConfig={ {text: 'nombre', value: '_id'}  }
+            onNewRequest={this.onNewRequest}
+            style={styles.autoComplete}
+            floatingLabelStyle={styles.floatingLabelFocusStyle}
+            floatingLabelFocusStyle={styles.floatingLabelFocusStyle}
+            errorText="Este campo es obligatorio solo cuando eres usuario nuevo"
+            errorStyle={styles.errorStyle}
+            /*style={!this.state.centroConsumo ? styles.autoComplete : styles.autoHidden }*/
+          />            
           <Divider />
-            <TextField onChange={this.onChange} name="nombreUsuario" hintText="Nombre de Usuario" type="text"  underlineShow={false} />
+            <TextField 
+              onChange={this.onChange} 
+              name="nombreUsuario" 
+              hintText="Nombre de Usuario" 
+              type="text"  
+              underlineShow={true} 
+            />
             <Divider />
-            <TextField onChange={this.onChange} name="nombre" hintText="Nombre" type="text"  underlineShow={false} />
+            <TextField onChange={this.onChange} name="nombre" hintText="Nombre" type="text"  underlineShow={true} />
             <Divider />
-            <TextField onChange={this.onChange} name="apellido" hintText="Apellido" type="text"  underlineShow={false} />
+            <TextField onChange={this.onChange} name="apellido" hintText="Apellido" type="text"  underlineShow={true} />
             <Divider />
-            <TextField onChange={this.onChange} name="codigoPostal" hintText="Código Postal" type="Codigo Postal"  underlineShow={false} />
-            <Divider />
-            <h6>Selecciona una foto para tu perfil</h6> <input onChange={this.getFile} className="input" name="fotoPerfil" type="file" />
-            <Divider />
-          </Paper>
+            <TextField onChange={this.onChange} name="codigoPostal" hintText="Código Postal" type="Codigo Postal"  underlineShow={true} />
+            <br/><br/>
+            <FlatButton
+            label="Elige una imagen"
+            labelPosition="before"
+            style={styles.uploadButton}
+            containerElement="label"
+            backgroundColor="#00897B"
+          > 
+            <input onChange={this.getFile} name="fotoPerfil" type="file" style={styles.uploadInput} />
+          </FlatButton>
+          <br/><br/>
+          <LinearProgress mode="determinate" value={this.state.progresoImagen} />
+          <span>{this.state.progresoImagen >= 100 ? "Listo tu imagen se ha cargado correctamente!" : "Espera la imagen se esta cargando..."}</span>
+          <br/><br/>      
+          <Divider />
           <RaisedButton onClick={this.sendEdit}  label="Actualizar Perfil" secondary={true}  />
           
         </Dialog>  

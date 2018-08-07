@@ -46,7 +46,9 @@ class Login extends Component {
   };
   render() {
     return (
-     <div className="login2">
+      
+      <div className="app" >
+      <div className="login2">
       <Paper className="paper2" zDepth={5}>
        <form>
          <div className="form-group">
@@ -73,8 +75,9 @@ class Login extends Component {
         />
         </div>         
       </Paper>
-       
+      </div>   
      </div>
+     
     );
   }
 }

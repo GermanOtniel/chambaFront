@@ -24,7 +24,7 @@ class Menu extends Component{
             <Link to="/ventas"><RaisedButton style={{height:50}} labelColor="#FAFAFA" backgroundColor="#546E7A" label="VENTAS" fullWidth={true}></RaisedButton></Link>
             </div>
           </div> 
-          <div className="menu-container"> 
+          {/* <div className="menu-container"> 
             <div>
             <Link to="/dinamicas"><RaisedButton style={{height:50}} labelColor="#FAFAFA" backgroundColor="#546E7A" label="TICKETS" fullWidth={true}></RaisedButton></Link>
             </div>
@@ -33,10 +33,10 @@ class Menu extends Component{
             <div>
             <Link to="/dinamicas"><RaisedButton style={{height:50}} labelColor="#FAFAFA" backgroundColor="#546E7A" label="MENSAJES" fullWidth={true} ></RaisedButton></Link>
             </div>
-          </div> 
+          </div>  */}
           <div className="menu-container"> 
             <div>
-            <RaisedButton href="http://1puntocinco.com/" style={{height:50}} labelColor="#FAFAFA"	 backgroundColor="#546E7A" label="ACADEMIA 1.5" fullWidth={true} ></RaisedButton>
+            <RaisedButton href="https://15onzas.teachable.com/" style={{height:50}} labelColor="#FAFAFA"	 backgroundColor="#546E7A" label="ACADEMIA 1.5" fullWidth={true} ></RaisedButton>
             </div> 
           </div> 
              
