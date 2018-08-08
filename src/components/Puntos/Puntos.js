@@ -1,8 +1,6 @@
 import React, {Component} from 'react';
 import TabSup from '../Profile/TabSup';
 import {getSingleUser} from '../../services/auth';
-import {Link} from 'react-router-dom';
-import RaisedButton from 'material-ui/RaisedButton';
 import './puntos.css';
 
 

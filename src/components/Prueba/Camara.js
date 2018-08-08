@@ -40,12 +40,13 @@ class Camara extends Component {
           </div>
         </Camera>
         <img
+          alt="Foto"
           style={style.captureImage}
           ref={(img) => {
             this.img = img;
           }}
         />
-        <img src={this.state.evidencia.archivo}/>
+        <img alt="Foto" src={this.state.evidencia.archivo}/>
       </div>
     );
   }

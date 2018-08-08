@@ -1,6 +1,6 @@
 .app2{
   width: 100%;
-  height: auto;
+  height: 100vh;
   background-size: 100%;
   background-image: url('https://firebasestorage.googleapis.com/v0/b/filetest-210500.appspot.com/o/testing%2Fpin%CC%83ita15.jpg?alt=media&token=788bba77-ee8f-40f2-8c09-0ff5ddcac466')
 }
@@ -9,7 +9,7 @@
     display: flex;
 }
 .paper{
-  height: 60vh;
+  height: 55vh;
   width: 85vw;
   margin: 40% auto;
 }
@@ -18,6 +18,7 @@
   border-radius: 10%;
   width: 200px;
   height: 40px;
-  color: white
+  color: white;
+  margin-top: 0%
 }
 

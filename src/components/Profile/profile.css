@@ -14,7 +14,6 @@ h1,h2,h3,h4,h5,h6,b,p,span,big{
 
 .padreProfile{
   text-align: center;
-
 }
 
 .paperProfile{
@@ -24,9 +23,12 @@ h1,h2,h3,h4,h5,h6,b,p,span,big{
   font-family: 'Lato', sans-serif;
 }
 .paperProfile > h4 {
-  background-color: #d8ce3a
+  background-color: #bc960b
 }
-
+.logoMenu{
+  text-align: center;
+  margin-top: 15px
+}
 .input{
   font-size: 12px
 }

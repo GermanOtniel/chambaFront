@@ -158,7 +158,7 @@ class Profile extends Component{
           style={style}
         />
       }
-      rightAvatar={<FloatingActionButton secondary={true} onClick={this.outUser} >
+      rightAvatar={<FloatingActionButton backgroundColor="#546E7A"  onClick={this.outUser} >
       <FontIcon className="material-icons">exit_to_app</FontIcon>
     </FloatingActionButton>}
       >
@@ -180,7 +180,7 @@ class Profile extends Component{
 
         <hr/>
         <div>
-        <RaisedButton onClick={this.handleOpen} label="Editar Perfil" primary={true}  />
+        <RaisedButton onClick={this.handleOpen} label="Editar Perfil" backgroundColor="#546E7A" labelColor="#FAFAFA"  />
         </div>
        <br/>
         </Paper>
@@ -192,9 +192,6 @@ class Profile extends Component{
           onRequestClose={this.handleClose}
           autoScrollBodyContent={true}      
         >
-
-
-          
           <AutoComplete
             floatingLabelText="Elige tu Centro de Consumo"
             hintText="En el que trabajas"

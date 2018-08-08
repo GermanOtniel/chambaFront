@@ -2,8 +2,6 @@ import React, {Component} from 'react';
 import TabSup from '../Profile/TabSup';
 import Dialog from 'material-ui/Dialog';
 import FlatButton from 'material-ui/FlatButton';
-import {Link} from 'react-router-dom';
-import RaisedButton from 'material-ui/RaisedButton';
 import Avatar from 'material-ui/Avatar';
 import Paper from 'material-ui/Paper';
 import { getVentas } from '../../services/ventas';
@@ -12,13 +10,6 @@ import Chip from 'material-ui/Chip';
 import './ventas.css';
 
 
-const style = {
-  height: 100,
-  width: '100%',
-  margin: 20,
-  textAlign: 'center',
-  display: 'inline-block',
-};
 const style2 = {
   margin: 5,
   float: 'right'
@@ -30,13 +21,15 @@ class Ventas extends Component{
   state={
     ventas:[],
     newArray:[],
-    open: false
+    open: false,
+    algo: true
   }
 
   componentWillMount(){
     const user = `${JSON.parse(localStorage.getItem('user'))._id}`;
     getVentas(user)
     .then(ventas=>{
+      let {algo} = this.state;
 //DINAMICAS EN LAS QUE EL USUARIO TIENE VENTAS APROBADAS 
       let dinamicasArray = ventas.map(venta=>venta.dinamica);
 // DONDE VOY A GUARDAR LAS DINAMICAS QUE YA NO SE REPITEN
@@ -58,11 +51,11 @@ class Ventas extends Component{
 // 2) RECORRE ELARRAY DE VENTAS
 // 3) COMPARA LOS IDs DE LAS DINAMICAS CON LOS IDS DE A QUE DINAMICA PERTENECEN LAS VENTAS
 // SI LOS ALGUN ID COINCIDE ESA VENTA SE INSERTA A ESA DINAMICA
-      for(var i = 0; i<newArray.length;i++){
+      for(var x = 0; x<newArray.length;x++){
         for(var j = 0; j<ventas.length;j++){
-          if( newArray[i]._id === ventas[j].dinamica._id ){
+          if( newArray[x]._id === ventas[j].dinamica._id ){
             for(let k = 0; k < ventas[j].marcas.length; k++){
-              newArray[i].ventas.push(ventas[j].marcas[k])
+              newArray[x].ventas.push(ventas[j].marcas[k])
             }
           }
         }
@@ -84,14 +77,14 @@ class Ventas extends Component{
               newArray[f].marcaPuntosVentas[b].puntosUsuario += newArray[f].ventas[n].ventas
               newArray[f].marcaPuntosVentas[b].nombre = newArray[f].ventas[n]._id.nombre
               newArray[f].marcaPuntosVentas[b].foto = newArray[f].ventas[n]._id.imagen
+              algo = false
             }
           }
         }
       }
 // HASTA AQUI newArray LLEVA LAS DINAMICAS UNICAS JUNTO CON LAS VENTAS QUE LE 
 //CORRESPONDE A CADA UNA Y TAMBIEN YA VAN SUMADAS ESAS VENTAS POR PRODUCTO.
-console.log(newArray)
-      this.setState({newArray})
+      this.setState({newArray,algo})
     })
     .catch(e=>console.log(e))
   }
@@ -122,11 +115,17 @@ console.log(newArray)
         onClick={this.handleClose}
       />,
     ];
-    const { newArray } = this.state;
+    const { newArray,algo } = this.state;
       return (
         <div>
           <div>
           <TabSup />
+          </div>
+          <div style={!algo ? {display:"none"} :  {display:"block"}}>
+          <div className="noVentas">
+          <h3>Aún no tienes ventas...</h3>
+          <h3>¡Vamos, participa en una dinámica!</h3>
+          </div>
           </div>
           {/* <div>
           {newArray.map((dinamic)=>(

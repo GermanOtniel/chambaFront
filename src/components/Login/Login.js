@@ -71,7 +71,7 @@ class Login extends Component {
           buttonText="Ingresa con Google"
           onSuccess={this.googleResponse}
           onFailure={this.onFailure}
-          className="botonGoogle"
+          className="botonGoogleLogin"
         />
         </div>         
       </Paper>

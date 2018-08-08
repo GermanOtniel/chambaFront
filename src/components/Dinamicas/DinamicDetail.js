@@ -2,10 +2,12 @@ import React, {Component} from 'react';
 import { getSingleDinamic } from '../../services/dinamicas';
 import { createEvidence } from '../../services/evidencias';
 import TabSup from '../Profile/TabSup';
-import {Card, CardActions, CardHeader, CardMedia, CardTitle, CardText} from 'material-ui/Card';
+import IconButton from 'material-ui/IconButton';
+import {Card, CardActions, CardMedia, CardTitle, CardText} from 'material-ui/Card';
 import FlatButton from 'material-ui/FlatButton';
 import Divider from 'material-ui/Divider';
 import Dialog from 'material-ui/Dialog';
+import FontIcon from 'material-ui/FontIcon';
 import RaisedButton from 'material-ui/RaisedButton';
 import TextField from 'material-ui/TextField';
 import Camera from 'react-camera';
@@ -44,6 +46,7 @@ const styles2 = {
   }
   
 };
+
 const label = {
   color:'white'
 }
@@ -60,12 +63,12 @@ const style = {
     width: '100%'
   },
   captureButton: {
-    backgroundColor: '#fff',
+    backgroundColor: 'red',
     borderRadius: '50%',
     height: 30,
     width: 30,
-    color: '#000',
-    margin: 7
+    margin: -20,
+    position: 'relative'
   },
   captureImage: {
     width: '100%',
@@ -88,6 +91,7 @@ class DinamicDetail extends Component{
     open: false,
     evidencia:{},
     takePhoto: true,
+    camara:false,
     fotito:"",
     file:{},
     marcas:[],
@@ -115,7 +119,6 @@ class DinamicDetail extends Component{
     uploadTask.on('state_changed', (snap)=>{
       const progresoImagen = (snap.bytesTransferred / snap.totalBytes) * 100;
       this.setState({progresoImagen});
-      console.log(this.state.progresoImagen)
     })
   };
   onCheck = (e) => {
@@ -129,13 +132,15 @@ class DinamicDetail extends Component{
       let file = new File([blob], "evidencia.jpg", {type: "image/jpeg", lastModified: Date.now()});
       this.setState({fotito:archivo,file:file})
     })
-
   }
+  setCamara = () => {
+    this.setState({camara: true});
+  };
   handleOpen = () => {
     this.setState({open: true});
   };
   handleClose = () => {
-    this.setState({open: false,evidencia:{},takePhoto:true});
+    this.setState({open: false,evidencia:{},takePhoto:true,camara:false});
   };
   onChangeEvidence = (e) => {
     const field = e.target.name;
@@ -148,7 +153,7 @@ class DinamicDetail extends Component{
       }
     }
     evidencia.marcas = chipData;
-    console.log(evidencia)
+    //console.log(evidencia)
     this.setState({evidencia,chipData})
   }
   onChange = (e) => {
@@ -169,7 +174,6 @@ class DinamicDetail extends Component{
     this.setState({evidencia});
     createEvidence(this.state.evidencia)
     .then(evidencia=>{
-      //console.log(evidencia)
     })
     .catch(e=>console.log(e))
     this.handleClose();
@@ -180,9 +184,10 @@ class DinamicDetail extends Component{
      this.setState({id})
     getSingleDinamic(id)
     .then(dinamic=>{
-      console.log(dinamic)
       let marcas = dinamic.marcaPuntosVentas.map(marca=> marca);
       let chipData = marcas
+      dinamic.fechaI = dinamic.fechaInicio.slice(0,10)
+      dinamic.fechaF = dinamic.fechaFin.slice(0,10)
       this.setState({dinamic,marcas,chipData})
     })
     .catch(e=>alert(e));
@@ -212,7 +217,7 @@ class DinamicDetail extends Component{
   }
   
   render(){
-    const {dinamic, marcas,takePhoto} = this.state;
+    const {dinamic, marcas,takePhoto,camara} = this.state;
       return (
         <div>
           <TabSup />
@@ -220,7 +225,7 @@ class DinamicDetail extends Component{
             <CardMedia
               overlay={<CardTitle 
               title={dinamic.nombreDinamica} 
-              subtitle={<b className="bSubtitle"> {dinamic.fechaInicio + " - " + dinamic.fechaFin}</b>} />}
+              subtitle={<b className="bSubtitle"> {dinamic.fechaI + " - " + dinamic.fechaF}</b>} />}
             >
               <img 
                 src={dinamic.imagenPremio} 
@@ -257,7 +262,7 @@ class DinamicDetail extends Component{
                 onClick={this.handleOpen} 
                 label="Participar" 
                 fullWidth={true}  
-                backgroundColor="#D62121" 
+                backgroundColor="#546E7A" 
                 labelStyle={label} 
                 disableTouchRipple={true}
               />
@@ -270,37 +275,45 @@ class DinamicDetail extends Component{
           onRequestClose={this.handleClose}
           autoScrollBodyContent={true}
         >
-            <Camera
-              style={takePhoto ? style.preview : style.hiddenImage }
-              ref={(cam) => {
-                this.camera = cam;
-              }}
-            >
-              <div style={style.captureContainer} onClick={this.takePicture}>
-                <div style={style.captureButton}>
-                </div >
-              </div>
-            </Camera>
-            <img
+
+        <div style={!camara ? style.preview : style.hiddenImage}>
+          <h6>Tomar foto:</h6>
+        <IconButton  
+        onClick={this.setCamara}>
+        <FontIcon className="material-icons">camera_alt</FontIcon>
+        </IconButton>
+        </div>
+
+        <div>
+        <Camera style={takePhoto && camara ? style.preview : style.hiddenImage} ref={(cam) => {this.camera = cam;}}>
+          <div style={style.captureContainer} onClick={this.takePicture}>
+            <div style={style.captureButton}>
+            </div >
+          </div>
+        </Camera>
+        </div>
+            
+            <img 
               style={style.captureImage }
               ref={(img) => {
               this.img = img;
               }}
             />
             <img 
+              alt="Foto"
               style={!this.state.takePhoto ? style.captureImage : style.hiddenImage }
               src={this.state.fotito}/>
             <Divider />
             <Checkbox
               label="¿Usaras esa foto?"
-              style={!this.state.takePhoto ? style.checkbox : style.hiddenImage }
+              style={!takePhoto ? style.checkbox : style.hiddenImage }
               onCheck={this.onCheck}
             />
             <br/>
              <LinearProgress mode="determinate" value={this.state.progresoImagen} />
           <span>{this.state.progresoImagen >= 100 ? "Listo tu imagen se ha cargado correctamente!" : ""}</span>
          
-            <br/><br/><br/><br/>
+            <br/><br/><br/>
             <TextField
               style={style.textField} 
               onChange={this.onChange} 
@@ -322,7 +335,8 @@ class DinamicDetail extends Component{
             <RaisedButton 
               onClick={this.sendEvidencia}  
               label="Enviar" 
-              secondary={true}  
+              backgroundColor="#546E7A"
+              labelColor="#FAFAFA"
             />
           
         </Dialog> 

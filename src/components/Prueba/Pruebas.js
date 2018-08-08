@@ -32,7 +32,6 @@ class Pruebas extends Component {
     };
 
     render() {
-        const {user} = this.state;
         let content = !!this.state.isAuthenticated ?
             (
                 <div>

@@ -44,14 +44,14 @@ class Dinamica extends Component{
       cellHeight={180}
       style={styles.gridList}
     >
-      {dinamics.map((dinamic) => (
+      {dinamics.sort((a, b) => new Date(b.fechaInicio) - new Date(a.fechaInicio)).map((dinamic) => (
         <GridTile
           key={dinamic.imagenPremio}
           title={dinamic.nombreDinamica}
-          subtitle={<b>{dinamic.fechaInicio} <br/>Modalidad:  {dinamic.modalidad}</b>}
+          subtitle={<b>{dinamic.fechaInicio.slice(0,10)} <br/>Modalidad:  {dinamic.modalidad}</b>}
           actionIcon={<Link to={`/dinamica/${dinamic._id}`} ><IconButton><FontIcon color="white" className="material-icons">pageview</FontIcon></IconButton></Link>}
         >
-          <img src={dinamic.imagenPremio} />
+          <img alt="Imagen Premio Dinámica" src={dinamic.imagenPremio} />
         </GridTile>
       ))}
     </GridList>
