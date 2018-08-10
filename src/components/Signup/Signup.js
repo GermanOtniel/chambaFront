@@ -13,7 +13,8 @@ class Signup extends Component {
 
   state={
     newUser:{},
-    user:{}
+    user:{},
+    boton:true
   }
 
   onChange = (e) => {
@@ -21,6 +22,12 @@ class Signup extends Component {
     const value = e.target.value;
     const {newUser} = this.state;
     newUser[field] = value;
+    if(newUser.correo.includes('@') && newUser.correo.includes('.') ){
+      this.setState({boton:false})
+    }
+    if(!newUser.correo.includes('@') || !newUser.correo.includes('.') ){
+      this.setState({boton:true})
+    }
     this.setState({newUser}); 
   }
   sendUser = (e) => {
@@ -54,7 +61,7 @@ class Signup extends Component {
          <h3>Regístrate</h3>
 
            <input onChange={this.onChange} name="correo" type="email" className="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Correo electrónico" />
-           <small id="emailHelp" className="form-text text-muted">Tus datos estaran seguros con nosotros.</small>
+           <small id="emailHelp" className="form-text text-muted">Tus datos estarán seguros con nosotros.</small>
          </div>
          <div className="form-group">
            <input onChange={this.onChange} name="password" type="password" className="form-control" placeholder="Contraseña"/>
@@ -62,7 +69,7 @@ class Signup extends Component {
         <div className="form-group">
            <input onChange={this.onChange} name="password2" type="password" className="form-control"  placeholder="Repite tu contraseña"/>
         </div>
-        <button onClick={this.sendUser} type="submit" className="btn btn-primary">Enviar</button>
+        <button disabled={this.state.boton} onClick={this.sendUser} type="submit" className="btn btn-primary">Enviar</button>
         <hr/>
         <h6>Si ya estás registrado <Link to="/login">Inicia sesión</Link></h6>
         <hr/>

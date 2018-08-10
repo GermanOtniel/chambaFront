@@ -50,7 +50,7 @@ class Ventas extends Component{
 // 1) RECOORE EL ARRAY DE DINAMICAS UNICAS
 // 2) RECORRE ELARRAY DE VENTAS
 // 3) COMPARA LOS IDs DE LAS DINAMICAS CON LOS IDS DE A QUE DINAMICA PERTENECEN LAS VENTAS
-// SI LOS ALGUN ID COINCIDE ESA VENTA SE INSERTA A ESA DINAMICA
+// SI ALGUN ID COINCIDE ESA VENTA SE INSERTA A ESA DINAMICA
       for(var x = 0; x<newArray.length;x++){
         for(var j = 0; j<ventas.length;j++){
           if( newArray[x]._id === ventas[j].dinamica._id ){
@@ -94,7 +94,7 @@ class Ventas extends Component{
 
   handleClose = () => {
     this.setState({open: false});
-    this.props.history.push("/menu");
+    this.props.history.push("/dinamicas");
   };
   oneWinner = (dinamic) => {
     let idDinamica = dinamic._id;

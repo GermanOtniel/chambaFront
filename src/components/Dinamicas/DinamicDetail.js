@@ -11,7 +11,7 @@ import FontIcon from 'material-ui/FontIcon';
 import RaisedButton from 'material-ui/RaisedButton';
 import TextField from 'material-ui/TextField';
 import Camera from 'react-camera';
-import {green700,blue500} from 'material-ui/styles/colors';
+import {green700,blue500,grey500} from 'material-ui/styles/colors';
 import LinearProgress from 'material-ui/LinearProgress';
 import firebase from '../../firebase/firebase';
 import Checkbox from 'material-ui/Checkbox';
@@ -37,6 +37,9 @@ const styles2 = {
     left: 0,
     width: '100%',
     opacity: 0,
+  },
+  errorStyle2: {
+    color: grey500,
   },
   errorStyle: {
     color: green700,
@@ -184,6 +187,7 @@ class DinamicDetail extends Component{
      this.setState({id})
     getSingleDinamic(id)
     .then(dinamic=>{
+      console.log(dinamic)
       let marcas = dinamic.marcaPuntosVentas.map(marca=> marca);
       let chipData = marcas
       dinamic.fechaI = dinamic.fechaInicio.slice(0,10)
@@ -275,8 +279,12 @@ class DinamicDetail extends Component{
           onRequestClose={this.handleClose}
           autoScrollBodyContent={true}
         >
+        <br/>
+        <div className="subrayadoImagen">
+          <b>{dinamic.imagen ? "Esta dinámica REQUIERE foto de tus ventas" : "Esta dinámica NO requiere foto de tus ventas"}</b>
+        </div>
 
-        <div style={!camara ? style.preview : style.hiddenImage}>
+        <div style={dinamic.imagen ? style.preview : style.hiddenImage}>
           <h6>Tomar foto:</h6>
         <IconButton  
         onClick={this.setCamara}>
@@ -325,7 +333,7 @@ class DinamicDetail extends Component{
               floatingLabelStyle={styles2.floatingLabelFocusStyle}
               floatingLabelFocusStyle={styles2.floatingLabelFocusStyle}
               errorText="Este campo no es obligatorio"
-              errorStyle={styles2.errorStyle} 
+              errorStyle={styles2.errorStyle2} 
             />
             <hr/>
             <h6>Define cuantas ventas hiciste de cada marca:</h6>

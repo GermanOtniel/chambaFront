@@ -7,7 +7,7 @@
 }
 .login2 {
   text-align: center;
-  display: flex
+  display: flex;
 }
 .paper2{
 height: 49vh;
@@ -23,3 +23,4 @@ position: relative;
   color: white;
   margin-top: 5%
 }
+

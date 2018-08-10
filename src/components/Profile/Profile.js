@@ -172,7 +172,7 @@ class Profile extends Component{
     <br/>
     <span>Centro de Consumo: </span><br/><b>{this.state.centroConsumo}</b>
     <br/>
-    <span>Nombre: </span> <br/> <b>{user.nombre + ' ' + user.apellido}</b>
+    <span>Nombre: </span> <br/> <b>{user.nombre ? user.nombre + ' ' + user.apellido : "Te recomendamos actualizar tu perfil"}</b>
     <br/>
     <span>Correo: </span> <br/> <b>{user.correo}</b>
     <br/>
