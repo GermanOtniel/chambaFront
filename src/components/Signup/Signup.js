@@ -76,7 +76,7 @@ class Signup extends Component {
        </form>
        <div>
         <GoogleLogin
-          clientId="853861088301-d6pp525e5fo1sbd9l1ebv0mogs158ofk.apps.googleusercontent.com"
+          clientId={process.env.REACT_APP_GOOGLEID}
           buttonText="Ingresa con Google"
           onSuccess={this.googleResponse}
           onFailure={this.onFailure}

@@ -1,7 +1,6 @@
 const baseURL = process.env.REACT_APP_BASE_URL;
 
 export function googleUser(userData){
-  console.log(process.env)
     return fetch(baseURL + '/auth/google', {
         method:'post',
         headers:{
