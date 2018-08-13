@@ -3,7 +3,6 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "dotenv": "^6.0.0",
     "firebase": "^3.0.0",
     "material-ui": "^0.20.1",
     "react": "^16.4.1",
