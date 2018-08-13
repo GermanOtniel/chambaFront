@@ -1,8 +1,7 @@
-const baseURL = 'http://localhost:3000';
+const baseURL = process.env.REACT_APP_BASE_URL;
 
 export function googleUser(userData){
-  // localhost 
-  //herokuapp '/auth/signup'
+  console.log(process.env)
     return fetch(baseURL + '/auth/google', {
         method:'post',
         headers:{
@@ -20,8 +19,6 @@ export function googleUser(userData){
     });
 }
 export function signup(userData){
-  // localhost 
-  //herokuapp '/auth/signup'
     return fetch(baseURL + '/auth/signup', {
         method:'post',
         headers:{

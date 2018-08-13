@@ -5,6 +5,8 @@ import Appy from './App';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import registerServiceWorker from './registerServiceWorker';
 import {BrowserRouter} from 'react-router-dom';
+require('dotenv').config()
+
 
 const App = () => (
   <MuiThemeProvider>

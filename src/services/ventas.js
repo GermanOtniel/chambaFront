@@ -1,4 +1,4 @@
-const baseURL = 'http://localhost:3000';
+const baseURL = process.env.REACT_APP_BASE_URL;
 
 export function getVentas(user){
   return fetch( baseURL + '/ventas/' + user )
