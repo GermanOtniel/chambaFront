@@ -198,6 +198,8 @@ class Ventas extends Component{
         </Dialog>
           </div>
           
+
+          
         </div>
       );
     }

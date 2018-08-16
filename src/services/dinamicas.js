@@ -1,10 +1,9 @@
-const baseURL = process.env.REACT_APP_BASE_URL;
-
-export function getDinamics(){
-  //console.log("peticion");
-  //  localhost  
-  // herokuapp  '/auth/profile/'
-  return fetch( baseURL + '/dinamica/' )
+// production 
+// const baseURL = process.env.REACT_APP_BASE_URL;
+// development
+const baseURL = "http://localhost:3000"
+export function getDinamics(idCentro){
+  return fetch( baseURL + '/dinamica/pwa/' + idCentro )
   .then(res=>{
     if(!res.ok) return Promise.reject(res.statusText);
     return res.json()

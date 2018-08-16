@@ -90,15 +90,20 @@ class Profile extends Component{
   }
   getFile = e => {
     const file = e.target.files[0];
+    const correo = `${JSON.parse(localStorage.getItem('user')).correo}`;
+    const date = new Date();
+    const date2 = String(date).slice(16,24)
+    const numberRandom = Math.random();
+    const number = String(numberRandom).slice(2,16)
+    const child = 'profileOf'+correo + date2 + number
     //aqui lo declaro
     const uploadTask = firebase.storage()
     .ref("users")
-    .child(file.name)
+    .child(child)
     .put(file);
     //aqui agreggo el exito y el error
     uploadTask
     .then(r=>{
-      console.log(r.downloadURL)
       const {newProfile} = this.state;
       newProfile.fotoPerfil =  r.downloadURL;
       this.setState({newProfile})
@@ -107,7 +112,6 @@ class Profile extends Component{
     uploadTask.on('state_changed', (snap)=>{
       const progresoImagen = (snap.bytesTransferred / snap.totalBytes) * 100;
       this.setState({progresoImagen});
-      console.log(this.state.progresoImagen)
     })
   };
   onNewRequest = (chosenRequest) => {

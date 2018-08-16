@@ -1,5 +1,7 @@
-const baseURL = process.env.REACT_APP_BASE_URL;
-
+// production 
+// const baseURL = process.env.REACT_APP_BASE_URL;
+// development
+const baseURL = "http://localhost:3000"
 export function getCenters(){
   //console.log("peticion");
   //  localhost  

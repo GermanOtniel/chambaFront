@@ -49,7 +49,8 @@ class Login extends Component {
       googleUser(this.state.user)
           .then(user=>{
           this.props.history.push(`/profile/${user._id}`);
-  })
+      })
+      .catch(e=>console.log(e))
   };
   render() {
     return (
