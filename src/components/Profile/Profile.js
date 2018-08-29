@@ -104,7 +104,7 @@ class Profile extends Component{
     if(user.cuentaConfirmada === false && user.correoEnviado === false){
       let bodyMessage = {
         dest: `${JSON.parse(localStorage.getItem('user')).correo}`,
-        sitio: "http://localhost:3000/confirm/"
+        sitio: "http://verificacion.1puntocinco.com:3000/confirm/"
       }
       sendEmailConfirmation(bodyMessage,id)
       .then(r=>{
