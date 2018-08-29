@@ -20,6 +20,27 @@ self.addEventListener('activate', event => {
   );
 });
 
+self.addEventListener('notificationclose', function(e) {
+  console.log(e)
+  var notification = e.notification;
+  var primaryKey = notification.data.primaryKey;
+
+  console.log('Closed notification: ' + primaryKey);
+});
+
+self.addEventListener('notificationclick', function(e) {
+  var notification = e.notification;
+  var primaryKey = notification.data.primaryKey;
+  var action = e.action;
+
+  if (action === 'close') {
+    notification.close();
+  } else {
+    clients.openWindow('http://jw.org');
+    notification.close();
+  }
+});
+
 // This triggers when user starts the app
 self.addEventListener('install', function(event) {
   if (doCache) {
@@ -54,3 +75,4 @@ self.addEventListener('fetch', function(event) {
     );
   }
 });
+

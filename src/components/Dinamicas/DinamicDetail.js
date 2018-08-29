@@ -90,12 +90,16 @@ class DinamicDetail extends Component{
   state={
     dinamic:{},
     open: false,
+    open2:false,
     evidencia:{},
     fotito:"",
     file:{},
     marcas:[],
     chipData:[],
     progresoImagen:0,
+    marcaDetalle:{},
+    boton:true,
+    faltaImagen:true
   }
   componentWillMount(){
     let id = this.props.match.params.id
@@ -130,7 +134,7 @@ class DinamicDetail extends Component{
    .then(r=>{
      const {evidencia} = this.state;
      evidencia.archivo =  r.downloadURL;
-     this.setState({evidencia})
+     this.setState({evidencia,faltaImagen:false})
    })
    .catch(e=>console.log(e)) //task
    uploadTask.on('state_changed', (snap)=>{
@@ -144,7 +148,13 @@ class DinamicDetail extends Component{
     this.setState({open: true});
   };
   handleClose = () => {
-    this.setState({open: false,evidencia:{},takePhoto:true,camara:false});
+    this.setState({open: false,evidencia:{},progresoImagen:0,boton:true,faltaImagen:true});
+  };
+  handleOpen2 = () => {
+    this.setState({open2: true});
+  };
+  handleClose2 = () => {
+    this.setState({open2: false});
   };
   onChangeEvidence = (e) => {
     const field = e.target.name;
@@ -157,7 +167,7 @@ class DinamicDetail extends Component{
       }
     }
     evidencia.marcas = chipData;
-    this.setState({evidencia,chipData})
+    this.setState({evidencia,chipData,boton:false})
   }
   onChange = (e) => {
     const field = e.target.name;
@@ -175,12 +185,22 @@ class DinamicDetail extends Component{
     evidencia.dinamica = idDinamica;
     evidencia.modalidad = dinamic.modalidad;
     evidencia.brand = dinamic.brand;
+    if(this.state.dinamic.checkEvidences === false){
+      evidencia.status = "Aprobada"
+    }
     this.setState({evidencia});
     createEvidence(this.state.evidencia)
     .then(evidencia=>{
     })
     .catch(e=>console.log(e))
     this.handleClose();
+  }
+  marca = (marca) => {
+    let {marcaDetalle} = this.state;
+    this.handleOpen2()
+    marcaDetalle = marca._id
+    marcaDetalle.descripcion = marca.descripcion
+    this.setState({marcaDetalle})
   }
 
  
@@ -194,6 +214,13 @@ class DinamicDetail extends Component{
         {data._id.nombre}
       </Chip>
       <TextField
+      onInput={(e)=>{ 
+        let dosDigitos = e.target.value 
+        dosDigitos = Math.max(0, parseInt(e.target.value) ).toString().slice(0,2)
+        e.target.value = Number(dosDigitos)
+        console.log(e.target.name + " " + e.target.value)
+      }}
+      min={0}
       onChange={this.onChangeEvidence}
       name={`${data._id._id}`}
       type="number"
@@ -209,7 +236,7 @@ class DinamicDetail extends Component{
   }
   
   render(){
-    const {dinamic, marcas,takePhoto,camara} = this.state;
+    const {dinamic, marcas,marcaDetalle} = this.state;
       return (
         <div>
           <TabSup />
@@ -233,7 +260,7 @@ class DinamicDetail extends Component{
             <b>{dinamic.modalidad === "Ventas" ? "Ventas requeridas por marca: " : "Puntos por unidad vendida: "}</b>     
             <br/><br/>
             {marcas.map( (marca, index) => (
-              <div key={index}>
+              <div onClick={()=>this.marca(marca)} key={index}>
               <Chip
               className="dinamicDetailHijo"
               >
@@ -254,7 +281,7 @@ class DinamicDetail extends Component{
                 onClick={this.handleOpen} 
                 label="Participar" 
                 fullWidth={true}  
-                backgroundColor="#546E7A" 
+                backgroundColor='#B71C1C' 
                 labelStyle={label} 
                 disableTouchRipple={true}
               />
@@ -284,7 +311,11 @@ class DinamicDetail extends Component{
           </FlatButton>
           <br/>
              <LinearProgress mode="determinate" value={this.state.progresoImagen} />
-          <span>{this.state.progresoImagen >= 100 ? "Listo tu imagen se ha cargado correctamente!" : ""}</span>
+             <span>{
+               this.state.progresoImagen >= 100 ? "Listo tu imagen se ha cargado correctamente!" 
+               : (this.state.progresoImagen > 0 && this.state.progresoImagen < 98 ? "Espera la imagen se está cargando..." 
+               : "La imagen tarda unos segundos en cargar")
+              }</span>
          
             <br/><br/>
         </div>
@@ -302,6 +333,7 @@ class DinamicDetail extends Component{
               errorText="Este campo no es obligatorio"
               errorStyle={styles2.errorStyle2} 
               rowsMax={1}
+              maxLength={150}
             />
             <hr/>
             <h6>Define cuantas ventas hiciste de cada marca:</h6>
@@ -309,13 +341,30 @@ class DinamicDetail extends Component{
               {this.state.chipData.map(this.renderChip, this)}
             </div>
             <RaisedButton 
+              disabled={ dinamic.imagen ? this.state.faltaImagen : this.state.boton}
               onClick={this.sendEvidencia}  
               label="Enviar" 
-              backgroundColor="#546E7A"
+              backgroundColor="#B71C1C"
               labelColor="#FAFAFA"
             />
           
         </Dialog> 
+        <div>
+        <Dialog
+          modal={false}
+          open={this.state.open2}
+          onRequestClose={this.handleClose2}
+          autoScrollBodyContent={true}
+        >
+        <div className="padreProfile">
+       <h6>Información adicional de {marcaDetalle.nombre}</h6>
+       <hr/>
+       {marcaDetalle.descripcion}
+       <br/>
+       <img alt="Foto Marca" width="100" height="90" src={marcaDetalle.imagen} />   
+       </div>      
+        </Dialog> 
+        </div>
       </div>
       );
     }

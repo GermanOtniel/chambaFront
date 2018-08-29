@@ -26,10 +26,12 @@ class Dinamica extends Component{
   state={
    dinamics:[],
    centro:false,
-   open:true
+   open:true,
+   dinamicas:false
   }
   componentWillMount(){
     let {centro} = this.state;
+    let {dinamicas} = this.state;
     let userCentro = `${JSON.parse(localStorage.getItem('user')).centroConsumo}`;
     let userCenter;
     if( userCentro === "undefined" ) {
@@ -42,25 +44,45 @@ class Dinamica extends Component{
       centro = false
       getDinamics(userCenter)
       .then(dinamics=>{
-        this.setState({dinamics,centro})
+        if(dinamics.length > 0){
+          dinamicas = false
+        }
+        else if(dinamics.length === 0){
+          dinamicas = true
+        }
+        this.setState({dinamics,centro,dinamicas})
       })
       .catch(e=>alert(e))
     }  
  }
  handleClose = () => {
   this.setState({centro: false});
-  //this.props.history.push("/dinamicas");
 };
-
-
+handleClose2 = () => {
+  this.setState({dinamicas: false});
+};
+dinamic=(dinamic)=>{
+    this.props.history.push(`/dinamica/${dinamic._id}`);
+}
+outOfDinamics=()=>{
+  this.props.history.push(`/profile/${JSON.parse(localStorage.getItem('user'))._id}`);
+}
   render(){
     const {dinamics,centro} = this.state;
     const actions = [
       <FlatButton
+        label="Ir a mi Perfil"
+        primary={true}
+        keyboardFocused={true}
+        onClick={this.outOfDinamics}
+      />,
+    ];
+    const actions2 = [
+      <FlatButton
         label="Entendido"
         primary={true}
         keyboardFocused={true}
-        onClick={this.handleClose}
+        onClick={this.outOfDinamics}
       />,
     ];
       return (
@@ -73,7 +95,7 @@ class Dinamica extends Component{
           title="¡Actualiza tu Perfil!"
           actions={actions}
           modal={false}
-          open={this.state.centro}
+          open={centro}
           onRequestClose={this.handleClose}
         >
           Para saber que Dinámicas corresponden a tu Centro de Consumo necesitamos saber en que Centro de Consumo trabajas,
@@ -83,13 +105,28 @@ class Dinamica extends Component{
           Google.</b>
         </Dialog>
           </div> 
+          <div>
+          <Dialog
+          title="¡Qué triste!"
+          modal={false}
+          actions={actions2}
+          open={this.state.dinamicas}
+          onRequestClose={this.handleClose2}
+        >
+          Lo lamentamos aún no hay Dinámicas existentes en tu Centro de Consumo.
+          <br/><br/>
+          <b>Pero no te preoucupes esto no sule pasar muy seguido y seguro pronto habra dinámicas, ¡regresa pronto!</b>
+        </Dialog>
+          </div>
         <div style={styles.root}>
           <GridList
       cellHeight={180}
       style={styles.gridList}
     >
       {dinamics.sort((a, b) => new Date(b.fechaInicio) - new Date(a.fechaInicio)).map((dinamic) => (
-        <GridTile
+      
+          <GridTile
+          onClick={()=>this.dinamic(dinamic)}
           key={dinamic.imagenPremio}
           title={dinamic.nombreDinamica}
           subtitle={<b>{dinamic.fechaInicio.slice(0,10)} <br/>Modalidad:  {dinamic.modalidad}</b>}
@@ -97,6 +134,7 @@ class Dinamica extends Component{
         >
           <img alt="Imagen Premio Dinámica" src={dinamic.imagenPremio} />
         </GridTile>
+       
       ))}
     </GridList>
         </div>

@@ -3,13 +3,13 @@
 // development
 const baseURL = "http://localhost:3000"
 
-export function getVentas(user){
-  return fetch( baseURL + '/ventas/' + user )
+export function getNotas(id){
+  return fetch( baseURL + '/nota/' + id )
   .then(res=>{
     if(!res.ok) return Promise.reject(res.statusText);
     return res.json()
   })
-  .then(ventas=>{
-    return ventas
+  .then(nota=>{
+    return nota
   })
 }

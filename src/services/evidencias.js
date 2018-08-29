@@ -1,5 +1,5 @@
-// production 
-// const baseURL = process.env.REACT_APP_BASE_URL;
+//production 
+//const baseURL = process.env.REACT_APP_BASE_URL;
 // development
 const baseURL = "http://localhost:3000"
 export function createEvidence(evidence){
@@ -18,3 +18,14 @@ export function createEvidence(evidence){
         return evidencia;
     });
 }
+
+export function getEvidencesByUser(user){
+    return fetch( baseURL + '/evidencia/pwa/' + user )
+    .then(res=>{
+      if(!res.ok) return Promise.reject(res.statusText);
+      return res.json()
+    })
+    .then(evidencias=>{
+      return evidencias
+    })
+  }

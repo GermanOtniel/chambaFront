@@ -1,5 +1,5 @@
-// production 
-// const baseURL = process.env.REACT_APP_BASE_URL;
+//production 
+//const baseURL = process.env.REACT_APP_BASE_URL;
 // development
 const baseURL = "http://localhost:3000"
 
@@ -99,5 +99,25 @@ export function editProfile(formulario,id){
   })
   .then(user=>{
     return user
+  })
+}
+
+//ENVIAR MENSAJES DE CONFIRMACIÓN
+
+export function sendEmailConfirmation(body,id){
+  return fetch(  baseURL + '/confirm/email/' + id ,{
+    method:'post',
+    headers:{
+        "Content-Type": "application/json"
+    },
+    body: JSON.stringify(body),
+    credentials:"include"
+})
+  .then(res=>{
+    if(!res.ok) return Promise.reject(res.statusText);
+    return res.json()
+  })
+  .then(r=>{
+    return r
   })
 }
