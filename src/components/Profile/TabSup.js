@@ -71,12 +71,18 @@ class TabSup extends Component{
             <div>
             <Link to="/dinamicas"><RaisedButton style={{height:50}} labelColor="#FAFAFA" backgroundColor="#546E7A" label="TICKETS" fullWidth={true}></RaisedButton></Link>
             </div>
-          </div> 
-          <div className="menu-container"> 
+          </div>
+          */} 
+          <div > 
             <div>
-            <Link to="/dinamicas"><RaisedButton style={{height:50}} labelColor="#FAFAFA" backgroundColor="#546E7A" label="MENSAJES" fullWidth={true} ></RaisedButton></Link>
+            <Link to="/mensajes"><RaisedButton style={{height:50,marginTop:10}} labelColor="#FAFAFA" backgroundColor="#546E7A" label="BUZÓN" fullWidth={true} ></RaisedButton></Link>
             </div>
-          </div>  */}
+          </div> 
+          <div > 
+            <div>
+            <Link to="/evidencias"><RaisedButton style={{height:50,marginTop:10}} labelColor="#FAFAFA" backgroundColor="#546E7A" label="ENVIADAS" fullWidth={true} ></RaisedButton></Link>
+            </div>
+          </div>  
           <div > 
             <div>
             <RaisedButton href="https://15onzas.teachable.com/" style={{height:50,marginTop:10}} labelColor="#FAFAFA"	 backgroundColor="#546E7A" label="ACADEMIA 1.5" fullWidth={true} ></RaisedButton>

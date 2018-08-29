@@ -3,18 +3,16 @@
   "name": "1puntocinco",
   "icons": [
     {
-      "src": "https://firebasestorage.googleapis.com/v0/b/filetest-210500.appspot.com/o/testing%2Flogo15.jpg?alt=media&token=70b5662e-bdb4-4d88-9174-7731e6c94340",
-      "sizes": "64x64 32x32 24x24 16x16",
-      "type": "image/png"
-    },
-    {
-      "src": "https://firebasestorage.googleapis.com/v0/b/filetest-210500.appspot.com/o/testing%2Flogo15.jpg?alt=media&token=70b5662e-bdb4-4d88-9174-7731e6c94340",
+      "src": "/logo15.png",
       "sizes": "512x512",
-      "type": "image/png" 
+      "type": "image/png"
     }
   ],
-  "start_url": "./index.html",
+  "start_url": "/",
+  "scope":"/",
   "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#ffffff"
+  "theme_color": "#ffa500",
+  "background_color": "#ffffff",
+  "related_applications":[],
+  "prefer_related_applications":false
 }

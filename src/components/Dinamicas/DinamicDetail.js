@@ -2,19 +2,14 @@ import React, {Component} from 'react';
 import { getSingleDinamic } from '../../services/dinamicas';
 import { createEvidence } from '../../services/evidencias';
 import TabSup from '../Profile/TabSup';
-import IconButton from 'material-ui/IconButton';
 import {Card, CardActions, CardMedia, CardTitle, CardText} from 'material-ui/Card';
 import FlatButton from 'material-ui/FlatButton';
-import Divider from 'material-ui/Divider';
 import Dialog from 'material-ui/Dialog';
-import FontIcon from 'material-ui/FontIcon';
 import RaisedButton from 'material-ui/RaisedButton';
 import TextField from 'material-ui/TextField';
-import Camera from 'react-camera';
 import {green700,blue500,grey500} from 'material-ui/styles/colors';
 import LinearProgress from 'material-ui/LinearProgress';
 import firebase from '../../firebase/firebase';
-import Checkbox from 'material-ui/Checkbox';
 import Avatar from 'material-ui/Avatar';
 import Chip from 'material-ui/Chip';
 import './dinamica.css';
@@ -37,6 +32,9 @@ const styles2 = {
     left: 0,
     width: '100%',
     opacity: 0,
+  },
+  uploadButton:{
+    color:"#FAFAFA"
   },
   errorStyle2: {
     color: grey500,
@@ -92,58 +90,71 @@ class DinamicDetail extends Component{
   state={
     dinamic:{},
     open: false,
+    open2:false,
     evidencia:{},
-    takePhoto: true,
-    camara:false,
     fotito:"",
     file:{},
     marcas:[],
     chipData:[],
     progresoImagen:0,
+    marcaDetalle:{},
+    boton:true,
+    faltaImagen:true
   }
+  componentWillMount(){
+    let id = this.props.match.params.id
+    this.setState({id})
+   getSingleDinamic(id)
+   .then(dinamic=>{
+     let marcas = dinamic.marcaPuntosVentas.map(marca=> marca);
+     let chipData = marcas
+     dinamic.fechaI = dinamic.fechaInicio.slice(0,10)
+     dinamic.fechaF = dinamic.fechaFin.slice(0,10)
+     this.setState({dinamic,marcas,chipData})
+   })
+   .catch(e=>alert(e));
+ }
   
+
   getFile = e => {
-    let file = this.state.file;
-    let user = `${JSON.parse(localStorage.getItem('user')).correo}`;
-    let fecha = String(file.lastModifiedDate).slice(4,-33);
-    //aqui lo declaro
-    const uploadTask = firebase.storage()
-    .ref("evidencias")
-    .child( fecha + user +"-"+ file.name)
-    .put(file);
-    //aqui agreggo el exito y el error
-    uploadTask
-    .then(r=>{
-      const {evidencia} = this.state;
-      evidencia.archivo =  r.downloadURL;
-      this.setState({evidencia})
-    })
-    .catch(e=>console.log(e+'ERRRRROOOOOR'))
-    uploadTask.on('state_changed', (snap)=>{
-      const progresoImagen = (snap.bytesTransferred / snap.totalBytes) * 100;
-      this.setState({progresoImagen});
-    })
+   const file = e.target.files[0];
+   const correo = `${JSON.parse(localStorage.getItem('user')).correo}`;
+   const date = new Date();
+   const date2 = String(date).slice(4,24)
+   const numberRandom = Math.random();
+   const number = String(numberRandom).slice(2,16)
+   const child = 'evidenceOf'+correo + date2 + number
+   //aqui lo declaro
+   const uploadTask = firebase.storage()
+   .ref("evidencias")
+   .child(child)
+   .put(file);
+   //aqui agreggo el exito y el error
+   uploadTask
+   .then(r=>{
+     const {evidencia} = this.state;
+     evidencia.archivo =  r.downloadURL;
+     this.setState({evidencia,faltaImagen:false})
+   })
+   .catch(e=>console.log(e)) //task
+   uploadTask.on('state_changed', (snap)=>{
+     const progresoImagen = (snap.bytesTransferred / snap.totalBytes) * 100;
+     this.setState({progresoImagen});
+   })
   };
-  onCheck = (e) => {
-    this.getFile();
-  }
-  takePicture = () => {
-    this.setState({takePhoto:false})
-    this.camera.capture()
-    .then(blob => {
-      let archivo = URL.createObjectURL(blob);
-      let file = new File([blob], "evidencia.jpg", {type: "image/jpeg", lastModified: Date.now()});
-      this.setState({fotito:archivo,file:file})
-    })
-  }
-  setCamara = () => {
-    this.setState({camara: true});
-  };
+
+
   handleOpen = () => {
     this.setState({open: true});
   };
   handleClose = () => {
-    this.setState({open: false,evidencia:{},takePhoto:true,camara:false});
+    this.setState({open: false,evidencia:{},progresoImagen:0,boton:true,faltaImagen:true});
+  };
+  handleOpen2 = () => {
+    this.setState({open2: true});
+  };
+  handleClose2 = () => {
+    this.setState({open2: false});
   };
   onChangeEvidence = (e) => {
     const field = e.target.name;
@@ -156,8 +167,7 @@ class DinamicDetail extends Component{
       }
     }
     evidencia.marcas = chipData;
-    //console.log(evidencia)
-    this.setState({evidencia,chipData})
+    this.setState({evidencia,chipData,boton:false})
   }
   onChange = (e) => {
     const field = e.target.name;
@@ -174,6 +184,10 @@ class DinamicDetail extends Component{
     evidencia.creador = idUser;
     evidencia.dinamica = idDinamica;
     evidencia.modalidad = dinamic.modalidad;
+    evidencia.brand = dinamic.brand;
+    if(this.state.dinamic.checkEvidences === false){
+      evidencia.status = "Aprobada"
+    }
     this.setState({evidencia});
     createEvidence(this.state.evidencia)
     .then(evidencia=>{
@@ -181,21 +195,15 @@ class DinamicDetail extends Component{
     .catch(e=>console.log(e))
     this.handleClose();
   }
-
-  componentWillMount(){
-     let id = this.props.match.params.id
-     this.setState({id})
-    getSingleDinamic(id)
-    .then(dinamic=>{
-      console.log(dinamic)
-      let marcas = dinamic.marcaPuntosVentas.map(marca=> marca);
-      let chipData = marcas
-      dinamic.fechaI = dinamic.fechaInicio.slice(0,10)
-      dinamic.fechaF = dinamic.fechaFin.slice(0,10)
-      this.setState({dinamic,marcas,chipData})
-    })
-    .catch(e=>alert(e));
+  marca = (marca) => {
+    let {marcaDetalle} = this.state;
+    this.handleOpen2()
+    marcaDetalle = marca._id
+    marcaDetalle.descripcion = marca.descripcion
+    this.setState({marcaDetalle})
   }
+
+ 
   renderChip(data) {
     return (
      <div key={data._id.nombre}>
@@ -206,6 +214,13 @@ class DinamicDetail extends Component{
         {data._id.nombre}
       </Chip>
       <TextField
+      onInput={(e)=>{ 
+        let dosDigitos = e.target.value 
+        dosDigitos = Math.max(0, parseInt(e.target.value) ).toString().slice(0,2)
+        e.target.value = Number(dosDigitos)
+        console.log(e.target.name + " " + e.target.value)
+      }}
+      min={0}
       onChange={this.onChangeEvidence}
       name={`${data._id._id}`}
       type="number"
@@ -221,7 +236,7 @@ class DinamicDetail extends Component{
   }
   
   render(){
-    const {dinamic, marcas,takePhoto,camara} = this.state;
+    const {dinamic, marcas,marcaDetalle} = this.state;
       return (
         <div>
           <TabSup />
@@ -245,7 +260,7 @@ class DinamicDetail extends Component{
             <b>{dinamic.modalidad === "Ventas" ? "Ventas requeridas por marca: " : "Puntos por unidad vendida: "}</b>     
             <br/><br/>
             {marcas.map( (marca, index) => (
-              <div key={index}>
+              <div onClick={()=>this.marca(marca)} key={index}>
               <Chip
               className="dinamicDetailHijo"
               >
@@ -266,7 +281,7 @@ class DinamicDetail extends Component{
                 onClick={this.handleOpen} 
                 label="Participar" 
                 fullWidth={true}  
-                backgroundColor="#546E7A" 
+                backgroundColor='#B71C1C' 
                 labelStyle={label} 
                 disableTouchRipple={true}
               />
@@ -283,45 +298,28 @@ class DinamicDetail extends Component{
         <div className="subrayadoImagen">
           <b>{dinamic.imagen ? "Esta dinámica REQUIERE foto de tus ventas" : "Esta dinámica NO requiere foto de tus ventas"}</b>
         </div>
-
+        <br/>
         <div style={dinamic.imagen ? style.preview : style.hiddenImage}>
-          <h6>Tomar foto:</h6>
-        <IconButton  
-        onClick={this.setCamara}>
-        <FontIcon className="material-icons">camera_alt</FontIcon>
-        </IconButton>
-        </div>
-
-        <div>
-        <Camera style={takePhoto && camara ? style.preview : style.hiddenImage} ref={(cam) => {this.camera = cam;}}>
-          <div style={style.captureContainer} onClick={this.takePicture}>
-            <div style={style.captureButton}>
-            </div >
-          </div>
-        </Camera>
-        </div>
-            
-            <img 
-              style={style.captureImage }
-              ref={(img) => {
-              this.img = img;
-              }}
-            />
-            <img 
-              alt="Foto"
-              style={!this.state.takePhoto ? style.captureImage : style.hiddenImage }
-              src={this.state.fotito}/>
-            <Divider />
-            <Checkbox
-              label="¿Usaras esa foto?"
-              style={!takePhoto ? style.checkbox : style.hiddenImage }
-              onCheck={this.onCheck}
-            />
-            <br/>
+        <FlatButton
+            label="Elige una imagen"
+            labelPosition="before"
+            style={styles2.uploadButton}
+            containerElement="label"
+            backgroundColor="#00897B"
+          > 
+            <input onChange={this.getFile} name="fotoPerfil" type="file" style={styles2.uploadInput} />
+          </FlatButton>
+          <br/>
              <LinearProgress mode="determinate" value={this.state.progresoImagen} />
-          <span>{this.state.progresoImagen >= 100 ? "Listo tu imagen se ha cargado correctamente!" : ""}</span>
+             <span>{
+               this.state.progresoImagen >= 100 ? "Listo tu imagen se ha cargado correctamente!" 
+               : (this.state.progresoImagen > 0 && this.state.progresoImagen < 98 ? "Espera la imagen se está cargando..." 
+               : "La imagen tarda unos segundos en cargar")
+              }</span>
          
-            <br/><br/><br/>
+            <br/><br/>
+        </div>
+        <br/>
             <TextField
               style={style.textField} 
               onChange={this.onChange} 
@@ -334,6 +332,8 @@ class DinamicDetail extends Component{
               floatingLabelFocusStyle={styles2.floatingLabelFocusStyle}
               errorText="Este campo no es obligatorio"
               errorStyle={styles2.errorStyle2} 
+              rowsMax={1}
+              maxLength={150}
             />
             <hr/>
             <h6>Define cuantas ventas hiciste de cada marca:</h6>
@@ -341,13 +341,30 @@ class DinamicDetail extends Component{
               {this.state.chipData.map(this.renderChip, this)}
             </div>
             <RaisedButton 
+              disabled={ dinamic.imagen ? this.state.faltaImagen : this.state.boton}
               onClick={this.sendEvidencia}  
               label="Enviar" 
-              backgroundColor="#546E7A"
+              backgroundColor="#B71C1C"
               labelColor="#FAFAFA"
             />
           
         </Dialog> 
+        <div>
+        <Dialog
+          modal={false}
+          open={this.state.open2}
+          onRequestClose={this.handleClose2}
+          autoScrollBodyContent={true}
+        >
+        <div className="padreProfile">
+       <h6>Información adicional de {marcaDetalle.nombre}</h6>
+       <hr/>
+       {marcaDetalle.descripcion}
+       <br/>
+       <img alt="Foto Marca" width="100" height="90" src={marcaDetalle.imagen} />   
+       </div>      
+        </Dialog> 
+        </div>
       </div>
       );
     }

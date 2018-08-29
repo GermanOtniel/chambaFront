@@ -13,3 +13,9 @@
   background-color: rgb(255, 255, 130);
   color: black
 }
+.noVentasRed{
+  background-color: rgb(129, 0, 0);
+  color: white;
+  text-align: center;
+  margin: 10% auto 
+}
