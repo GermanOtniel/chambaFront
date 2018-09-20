@@ -136,6 +136,19 @@ class Profile extends Component{
     this.setState({newProfile}); 
   }
 
+  sendMessageAgain = (e) => {
+    const id = `${JSON.parse(localStorage.getItem('user'))._id}`;
+    let bodyMessage = {
+      dest: `${JSON.parse(localStorage.getItem('user')).correo}`,
+      sitio: "http://verificacion.1puntocinco.com:3000/confirm/"
+    }
+    sendEmailConfirmation(bodyMessage,id)
+    .then(r=>{
+      //console.log(r)
+      this.handleClose3()
+    })
+    .catch(e=>console.log(e))
+  }
   // onChange2 = (e) => {
   //   const field = e.target.name;
   //   const value = e.target.value;
@@ -250,6 +263,12 @@ class Profile extends Component{
         primary={true}
         keyboardFocused={true}
         onClick={this.handleClose3}
+      />,
+      <FlatButton
+        label="Reenviar correo"
+        primary={true}
+        keyboardFocused={true}
+        onClick={this.sendMessageAgain}
       />,
     ];
       return (

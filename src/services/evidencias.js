@@ -29,3 +29,11 @@ export function getEvidencesByUser(user){
       return evidencias
     })
   }
+
+  export function getEvidencesByDinamic(id) {
+    return fetch( baseURL + '/evidencia/dinamica/' + id)
+    .then(r=>r.json())
+    .then(evidencias=>{
+      return evidencias
+    })
+  }

@@ -13,3 +13,14 @@ export function getNotas(id){
     return nota
   })
 }
+
+// export function deleteNote(id){
+//   return fetch( baseURL + '/nota/delete/' + id )
+//   .then(res=>{
+//     if(!res.ok) return Promise.reject(res.statusText);
+//     return res.json()
+//   })
+//   .then(nota=>{
+//     return nota
+//   })
+// }

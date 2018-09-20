@@ -1,8 +1,12 @@
 import React, {Component} from 'react';
 import {Tabs, Tab} from 'material-ui/Tabs';
 import Drawer from 'material-ui/Drawer';
+import Dialog from 'material-ui/Dialog';
+import TextField from 'material-ui/TextField';
+import FlatButton from 'material-ui/FlatButton';
 import RaisedButton from 'material-ui/RaisedButton';
 import FontIcon from 'material-ui/FontIcon';
+import {changePassword} from '../../services/auth';
 import { Link } from 'react-router-dom';
 import './profile.css';
 
@@ -10,15 +14,101 @@ import './profile.css';
 class TabSup extends Component{
 
   state={
-    open:false
+    open:false,
+    open2:false,
+    cambios:{},
+    passwordIncorrecta:true,
+    passwordCoinciden:true,
+    usuarioGmail:false,
+    passwordd:"",
+    correoo:""
+  }
+
+  componentWillMount(){
+    const userLogged = `${JSON.parse(localStorage.getItem('userLogged'))}`;
+    if(userLogged !== "null"){
+      const correo = `${JSON.parse(localStorage.getItem('userLogged')).correo}`;
+      const password = `${JSON.parse(localStorage.getItem('userLogged')).password}`;
+      this.setState({usuarioGmail:false,passwordd:password,correoo:correo})
+    }
+    else if(userLogged === "null"){
+      this.setState({usuarioGmail:true})
+    }
+  }
+
+  onChange = (e) => {
+    let {passwordd} = this.state;
+    const field = e.target.name;
+    const value = e.target.value;
+    const {cambios} = this.state;
+    cambios[field] = value;
+    if (e.target.name === "passwordAntigua"){
+      if(cambios.passwordAntigua !== passwordd){
+        //console.log('No es correcta')
+        this.setState({passwordIncorrecta:false})
+      }
+      else if(cambios.passwordAntigua === passwordd){
+        //console.log('Si es correcta')
+        this.setState({passwordIncorrecta:true})
+      }
+    }
+   else if (e.target.name === "passwordNew2" || e.target.name === "passwordNew"){
+    if(cambios.passwordNew !== cambios.passwordNew2){
+      //console.log('No es correcta')
+      this.setState({passwordCoinciden:false})
+    }
+    else if(cambios.passwordNew === cambios.passwordNew2){
+      //console.log('Si es correcta')
+      this.setState({passwordCoinciden:true})
+    }
+   }
+   
+    this.setState({cambios}); 
   }
 
   handleToggle = () => this.setState({open: !this.state.open});
 
   handleClose = () => this.setState({open: false});
 
-  
+  handleOpen = () => {
+    this.setState({open2: true});
+  };
+  handleClose = () => {
+    this.setState({open2: false});
+  };
+
+  changePassword = () =>{
+    this.handleOpen()
+  }
+  sendNewPassword =()=>{
+    let {correoo,cambios} = this.state;
+    let body = {
+      correo:correoo,
+      newPasswordString:cambios.passwordNew
+    }
+    changePassword(body)
+    .then(r=>{
+      this.handleClose()
+    })
+    .catch(e=>console.log(e))
+  }
   render(){
+    const actions2 = [
+      <FlatButton
+        label="Enviar cambios"
+        primary={true}
+        keyboardFocused={true}
+        onClick={this.sendNewPassword}
+        disabled={!this.state.passwordIncorrecta}
+      />,
+      <FlatButton
+        label="Cancelar"
+        primary={true}
+        keyboardFocused={true}
+        onClick={this.handleClose}
+      />,
+    ];
+    const {passwordIncorrecta,passwordCoinciden,usuarioGmail} = this.state;
       return (
         <div>
       <Tabs
@@ -88,8 +178,51 @@ class TabSup extends Component{
             <RaisedButton href="https://15onzas.teachable.com/" style={{height:50,marginTop:10}} labelColor="#FAFAFA"	 backgroundColor="#546E7A" label="ACADEMIA 1.5" fullWidth={true} ></RaisedButton>
             </div> 
           </div> 
+          <div > 
+            <div>
+            <RaisedButton onClick={this.changePassword} style={usuarioGmail ? {display:"none"} : {height:50,marginTop:10}} labelColor="#FAFAFA"	 backgroundColor="#546E7A" label="CAMBIAR CONTRASEÑA" fullWidth={true} ></RaisedButton>
+            </div> 
+          </div> 
           </div>
           </Drawer>
+          </div>
+          <div>
+          <Dialog
+          title="Cambia tu contraseña"
+          modal={false}
+          actions={actions2}
+          open={this.state.open2}
+          onRequestClose={this.handleClose}
+        >
+        <b>Si tu te logueas con Google(Gmail), esta función no es para ti.</b>
+        <TextField
+          hintText="Contraseña actual"
+          floatingLabelText="Contraseña actual"
+          type="Password"
+          name="passwordAntigua"
+          onChange={this.onChange}
+        />
+         <div>
+          <b style={passwordIncorrecta ? {color:'green'} : {color:'red'}} className="msjContraseñas">{passwordIncorrecta ? "" : "La contraseña que estas ingresando es incorrecta"}</b>
+        </div>
+         <TextField
+          hintText="Nueva contraseña"
+          floatingLabelText="Nueva contraseña"
+          type="Password"
+          name="passwordNew"
+          onChange={this.onChange}
+        />
+         <TextField
+          hintText="Repite tu nueva contraseña"
+          floatingLabelText="Repite tu nueva contraseña"
+          type="Password"
+          name="passwordNew2"
+          onChange={this.onChange}
+        />
+        <div>
+          <b style={passwordCoinciden ? {color:'green'} : {color:'red'}} className="msjContraseñas">{passwordCoinciden ? "" : "Las contraseñas no coinciden"}</b>
+        </div>
+        </Dialog>
           </div>
     </div>
       );

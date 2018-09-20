@@ -121,3 +121,40 @@ export function sendEmailConfirmation(body,id){
     return r
   })
 }
+
+// RECUPERAR CONTRASEÑA
+export function getNewPassword(correo){
+  return fetch(  baseURL + '/auth/password/',{
+    method:'post',
+    headers:{
+        "Content-Type": "application/json"
+    },
+    body: JSON.stringify(correo),
+})
+  .then(res=>{
+    if(!res.ok) return Promise.reject(res.statusText);
+    return res.json()
+  })
+  .then(user=>{
+    return user
+  })
+}
+
+// CAMBIAR CONTRASEÑA
+export function changePassword(body){
+  return fetch(  baseURL + '/auth/password/pwa',{
+    method:'post',
+    headers:{
+        "Content-Type": "application/json"
+    },
+    body: JSON.stringify(body),
+    credentials:"include"
+})
+  .then(res=>{
+    if(!res.ok) return Promise.reject(res.statusText);
+    return res.json()
+  })
+  .then(user=>{
+    return user
+  })
+}
