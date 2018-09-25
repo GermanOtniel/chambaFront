@@ -28,6 +28,7 @@ class Signup extends Component {
     const value = e.target.value;
     const {newUser} = this.state;
     newUser[field] = value;
+    newUser.correo = newUser.correo.toLowerCase()
     if(newUser.correo.includes('@') && newUser.correo.includes('.') ){
       this.setState({boton:false})
     }

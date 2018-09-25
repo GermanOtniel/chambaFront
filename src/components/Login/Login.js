@@ -25,6 +25,7 @@ class Login extends Component {
     open4:false
   }
   componentWillMount(){
+    console.log('Sarabi Germán esta esforzándose...')
     let usuarioGuardado;
     let hayUsuario = `${JSON.parse(localStorage.getItem('userLogged'))}`;
     if ( hayUsuario === "null" ){

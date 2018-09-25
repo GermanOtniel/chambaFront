@@ -244,7 +244,11 @@ class DinamicDetail extends Component{
     this.setState({open: true});
   };
   handleClose = () => {
-    this.setState({open: false,evidencia:{},progresoImagen:0,boton:true,faltaImagen:true});
+    const {chipData} =this.state;
+    for(let i = 0; i<chipData.length;i++){
+        chipData[i].ventas = 0
+    }
+    this.setState({open: false,evidencia:{},progresoImagen:0,boton:true,faltaImagen:true,chipData});
   };
   handleOpen2 = () => {
     this.setState({open2: true});
@@ -324,6 +328,10 @@ class DinamicDetail extends Component{
     this.setState({verRanking:false})
   }
 
+  refreshPage = () =>{
+    this.handleClose3()
+    window.location.reload()
+  }
  
   renderChip(data) {
     return (
@@ -362,6 +370,14 @@ class DinamicDetail extends Component{
               disabled={ dinamic.imagen ? this.state.faltaImagen : this.state.boton}
               onClick={this.sendEvidencia}  
               label="Enviar" 
+              backgroundColor="#B71C1C"
+              labelColor="#FAFAFA"
+            />
+    ];
+    const actions2 = [
+      <RaisedButton 
+              onClick={this.refreshPage}  
+              label="Ok" 
               backgroundColor="#B71C1C"
               labelColor="#FAFAFA"
             />
@@ -521,8 +537,8 @@ class DinamicDetail extends Component{
         <div>
         <Dialog
           modal={false}
+          actions={actions2}
           open={this.state.open3}
-          onRequestClose={this.handleClose3}
           autoScrollBodyContent={true}
         >
         <div className="padreProfile">

@@ -193,6 +193,7 @@ class TabSup extends Component{
           actions={actions2}
           open={this.state.open2}
           onRequestClose={this.handleClose}
+          autoScrollBodyContent={true}
         >
         <b>Si tu te logueas con Google(Gmail), esta función no es para ti.</b>
         <TextField

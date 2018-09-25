@@ -52,7 +52,7 @@ class Dinamica extends Component{
         }
         this.setState({dinamics,centro,dinamicas})
       })
-      .catch(e=>alert(e))
+      .catch(e=>console.log(e))
     }  
  }
  handleClose = () => {
