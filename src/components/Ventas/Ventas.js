@@ -3,7 +3,6 @@ import TabSup from '../Profile/TabSup';
 import Dialog from 'material-ui/Dialog';
 import FlatButton from 'material-ui/FlatButton';
 import Avatar from 'material-ui/Avatar';
-import Paper from 'material-ui/Paper';
 import { getVentas } from '../../services/ventas';
 import { sendWinner } from '../../services/dinamicas';
 import Chip from 'material-ui/Chip';
@@ -25,6 +24,9 @@ class Ventas extends Component{
     algo: true
   }
 
+  // TRAEMOS TODAS LAS VENTAS QUE ESTE USUARIO A PRODUCIDO
+  // Y LAS VAMOS ACOMODANDO, SACAMOS LAS DINAMICAS A LAS CUALES PERTENECEN ESTAS VENTAS, DEJAMOS DINAMICAS NO REPETIDAS...
+  // Y SE VA EXPLICANDO MAS A DETALLE DENTRO DE LAS FUNCIONES
   componentWillMount(){
     const user = `${JSON.parse(localStorage.getItem('user'))._id}`;
     getVentas(user)
@@ -67,7 +69,7 @@ class Ventas extends Component{
 // 1) RECORREMOS EL ARRAY DE DINAMICAS UNICAS
 // 2) CUANDO ESTAMOS DENTRO DE CADA DINAMICA, RECORREMOS EL ARRAY DE marcaPuntosVentas
 //EN DONDE ESTAN LAS MARCAS PARTICIPANTES DE ESA DINAMICA JUNTO CON LAS METAS DE VENTA DE CADA PRODUCTO
-// 3) DESPUES RECORREMOS EL ARRAY DE ventas LOGRADAS PR EL USUARIO Y HACEMOS LA COMPARACION NUEVAMENTE,
+// 3) DESPUES RECORREMOS EL ARRAY DE ventas LOGRADAS POR EL USUARIO Y HACEMOS LA COMPARACION NUEVAMENTE,
 // ESTA COMPARACION LA HACEMOS POR EL ID DE LA MARCA, SI ESTE COINCIDE SUMALE LAS VENTAS
 // Y PONLE NOMBRE TAMBIEN A ESA MARCA
       for(let f = 0; f < newArray.length; f++){
@@ -79,6 +81,24 @@ class Ventas extends Component{
               newArray[f].marcaPuntosVentas[b].foto = newArray[f].ventas[n]._id.imagen
               algo = false
             }
+            // PARA HABILITAR EL BOTON DE RECLAMAR PREMIO NECESITAMOS VERIFICAR QUE LAS VENTAS QUE HA REALIZADO UN USUARIO 
+            // DE UNA MARCA CUMPLAN CON LA META DE VENTAS PARA ESA MARCA, ES POR ESO QUE NOS ADENTRAMOS EN CADA MARCA, 
+            // VERIFICAMOS SI LAS VENTAS HECHAS POR EL USUARIO SON IGUAL O MAYOR A LA META DE VENTAS PARA ESA MARCA
+            // SI SI ES IGUAL O MAYOR AGREGA UN ATRIBUTO A ESA MARCA LLAMADO META Y LO CAMBIA A TRUE
+            if(newArray[f].marcaPuntosVentas[b].puntosUsuario >= newArray[f].marcaPuntosVentas[b].puntosVentas){
+              newArray[f].marcaPuntosVentas[b].meta = true
+            }
+            // SI LA META ES MAYOR A LAS VENTAS EL ATRIBUTO META ES FALSE
+            else if(newArray[f].marcaPuntosVentas[b].puntosUsuario < newArray[f].marcaPuntosVentas[b].puntosVentas){
+              newArray[f].marcaPuntosVentas[b].meta = false
+            }
+          }
+          // DESPUES VEMOS CUANTOS TRUE HAY EN LAS MARCAS, SI LA CANTIDAD DE TRUES ES IGUAL A LA CANTIDAD DE MARCAS
+          // SIGNIFICA QUE TODAS LAS MARCAS HAN CUMPLIDO CON SU META DE VENTAS, LO CUAL SIGNIFICA QUE TENEMOS QUE ACTIVAR EL BOTON DE 
+          // RECLAMAR PREMIO
+          if(newArray[f].marcaPuntosVentas[b].meta === true){
+            newArray[f].ventasTotales += 1
+            if(newArray[f].ventasTotales  === newArray[f].marcaPuntosVentas.length ) newArray[f].ganador = true;
           }
         }
       }
@@ -88,14 +108,17 @@ class Ventas extends Component{
     })
     .catch(e=>console.log(e))
   }
+  // ABRE Y CIERRA DIALOGOS DE INFORMACION
   handleOpen = () => {
     this.setState({open: true});
   };
-
   handleClose = () => {
     this.setState({open: false});
     this.props.history.push("/dinamicas");
   };
+
+  // FUNCION QUE PERMITE AL USUARIO HACERSE UN GANADOR DE LA DINAMICA, ESTE BOTON Y ESTA FUNCION SOLO DEBERIA DE VERSE CUANDO UN 
+  // USUARIO HA LOGRADO LAS METAS DE VENTAS DE LA DINAMICA CORRESPONDIENTE
   oneWinner = (dinamic) => {
     let idDinamica = dinamic._id;
     dinamic.winner = `${JSON.parse(localStorage.getItem('user'))._id}`;
@@ -150,9 +173,8 @@ class Ventas extends Component{
 
           <div>
           {newArray.map((dinamic)=>(
-              <Paper key={dinamic._id} className="paperVentas" zDepth={3} rounded={false}>
-              <hr className="hrVentas"/>
-              <Avatar
+             <div key={dinamic._id}>
+               <Avatar
                 src={dinamic.imagenPremio}
                 size={90}
                 style={style2}
@@ -172,18 +194,17 @@ class Ventas extends Component{
                 <br/> 
                 <p>Meta de Ventas: <big>{marca.puntosVentas}</big> </p>
                 <p>Ventas Logradas: <big className="bigVentas">{marca.puntosUsuario}</big> </p>
-                {marca.puntosUsuario >= marca.puntosVentas ? dinamic.ganador = true : dinamic.ganador = false}
                 <hr/>
                 </div>
               ))}
+              <hr className="hrVentas"/>
               <div className="buttonVentas">
               <button style={dinamic.ganador === true ? {display:"block"} : {display:"none"} } onClick={() => this.oneWinner(dinamic)}>Reclamar premio</button>
               </div>
-              </Paper>
+             </div>
           ))} 
           </div>
           
-
 
           <div>
           <Dialog

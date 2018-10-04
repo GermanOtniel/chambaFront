@@ -1,16 +1,12 @@
 import React, {Component} from 'react';
 import { getSingleDinamic } from '../../services/dinamicas';
-import { createEvidence,getEvidencesByDinamic } from '../../services/evidencias';
+import { getEvidencesByDinamic } from '../../services/evidencias';
 import TabSup from '../Profile/TabSup';
 import {Card, CardActions, CardMedia, CardTitle, CardText} from 'material-ui/Card';
 import FlatButton from 'material-ui/FlatButton';
 import Dialog from 'material-ui/Dialog';
 import {GridList, GridTile} from 'material-ui/GridList';
 import RaisedButton from 'material-ui/RaisedButton';
-import TextField from 'material-ui/TextField';
-import {green700,blue500,grey500} from 'material-ui/styles/colors';
-import LinearProgress from 'material-ui/LinearProgress';
-import firebase from '../../firebase/firebase';
 import Avatar from 'material-ui/Avatar';
 import Chip from 'material-ui/Chip';
 import './dinamica.css';
@@ -37,127 +33,63 @@ const styles = {
   }
 };
 
-const styles2 = {
-  chip: {
-    margin: 4,
-  },
-  wrapper: {
-    display: 'flex',
-    flexWrap: 'wrap',
-  },
-  uploadInput: {
-    cursor: 'pointer',
-    position: 'absolute',
-    top: 0,
-    bottom: 0,
-    right: 0,
-    left: 0,
-    width: '100%',
-    opacity: 0,
-  },
-  uploadButton:{
-    color:"#FAFAFA"
-  },
-  errorStyle2: {
-    color: grey500,
-  },
-  errorStyle: {
-    color: green700,
-  },
-  floatingLabelFocusStyle: {
-    color: blue500,
-  },
-  label2:{
-    color:'#004D40'
-  }
-};
 
 const label = {
   color:'white'
 }
 
 
-const style = {
-  preview: {
-    position: 'relative',
-  },
-  captureContainer: {
-    display: 'flex',
-    position: 'absolute',
-    justifyContent: 'center',
-    zIndex: 1,
-    bottom: 0,
-    width: '100%'
-  },
-  captureButton: {
-    backgroundColor: 'red',
-    borderRadius: '50%',
-    height: 30,
-    width: 30,
-    margin: -20,
-    position: 'relative'
-  },
-  captureImage: {
-    width: '100%',
-  },
-  hiddenImage:{
-    display:"none"
-  },
-  checkbox: {
-    marginBottom: 16,
-  },
-  textField:{
-    marginTop:-500
-  }
-};
-
 class DinamicDetail extends Component{
 
   state={
     dinamic:{},
-    open: false,
     open2:false,
-    evidencia:{},
     fotito:"",
     file:{},
     marcas:[],
-    chipData:[],
-    progresoImagen:0,
     marcaDetalle:{},
     boton:true,
     faltaImagen:true,
     open3:false,
     open4:false,
     newCreadores:[],
-    verRanking: false
+    verRanking: false,
+    puntos:0
   }
+
+  // AQUI SE TRAEN LOS DETALLES DE UNA DINAMICA, PERO TAMBIEN SE TRAEN LAS EVIDENCIAS QUE HA GENERADO ESA DINAMICA
+  // Y SE ORDENAN POR USUARIO QUE LAS HA CREADO, SE HACE UNA OPERACION MATEMATICA PARA ASIGNAR VENTAS TOTALES O PUNTOS
+  // SEGUN CORRESPONDA EL CASO
   componentWillMount(){
     let id = this.props.match.params.id
+    let idUser = `${JSON.parse(localStorage.getItem('user'))._id}`;
+    let {puntos} = this.state;
     this.setState({id})
    getSingleDinamic(id)
    .then(dinamic=>{
-     //console.log(dinamic)
      let marcas = dinamic.marcaPuntosVentas.map(marca=> marca);
      let chipData = marcas
      dinamic.fechaI = dinamic.fechaInicio.slice(0,10)
      dinamic.fechaF = dinamic.fechaFin.slice(0,10)
      getEvidencesByDinamic(id)
      .then(evidencias=>{
-       //console.log(r)
+       // TRAEMOS TODAS LAS EVIDENCIAS QUE HA GENERADO UNA DINAMICA
+
+       // LOS CREADORES DE LAS EVIDENCIAS LOS GUARDAMOS EN creadoresArray
        let creadoresArray = evidencias.map(evidencia=>evidencia.creador)
-        //Aqui guardaremos los usuarios unicos es decir ya no repetidos.
+       // newCreadores SERA EL ARRAY DONDE GUARDAREMOS LOS CREADORES DE LAS EVIDENCIAS PERO EN DONDE NO SE REPITEN
         var {newCreadores} = this.state;
-        // No sabemos para que es pero es util, parece q aqui se guardan los que si estan repetidos...
+        // SIGUE SIENDO UNA DUDA QUE HACE lookupObject PERO ES NECESARIO
         var lookupObject  = {};
-
-        //Aqui comienzan los ciclos para dejar un array con usuarios unicos:
-
         for(var iii in creadoresArray) {
           lookupObject[creadoresArray[iii]['_id']] = creadoresArray[iii];
         }
         for(iii in lookupObject) {
           newCreadores.push(lookupObject[iii]);
        }
+       // HASTA AQUI TENEMOS EN newCreadores LOS USUARIOS SIN REPETIRSE QUE HAN MANDADO EVIDENCIAS EN ESTA DINAMICA
+       
+       // AQUI VAMOS A AGRUPAR LAS EVIDENCIAS POR USUARIO
        for(var i = 0; i<newCreadores.length;i++){
         for(var j = 0; j<evidencias.length;j++){
           if( newCreadores[i]._id === evidencias[j].creador._id ){
@@ -168,6 +100,11 @@ class DinamicDetail extends Component{
           }
         }
       }
+
+      //AQUI SE LE INSERTAN LAS MARCAS QUE DEBE DE VENDER CADA USUARIO, SE USA UN CICLO PARECIDO A CUANDO QUEREMOS DEJAR
+      // LOS USUARIOS SIN REPETIRSE QUE HAN MANDADO EVIDENCIAS, PORQUE NECESITAMOS TENER EN UN ATRIBUTO DE MI USUARIO TANTO
+      // LAS MARCAS Y LOS PUNTOS QUE DA CADA MARCA, COMO LAS VENTAS QUE HA HECHO DE CADA MARCA EL USUARIO PARA HACER
+      // LAS OPERACIONES CORRESPONDIENTES DE VENTAS O PUNTOS.
       var lookupObject3  = {};
       for(let z = 0; z < newCreadores.length; z++){
         for(var ii in newCreadores[z].ventasDinamica) {
@@ -178,7 +115,9 @@ class DinamicDetail extends Component{
        }
       }
 
-
+      // AQUI SE AGRUPAN LAS VENTAS POR CADA MARCA EN CADA EVIDENCIA REALIZADA POR CADA USUARIO.
+      // SI UN USUARIO REGISTRO EN UNA EVIDENCIA 10 DE COCA 10 DE FANTA Y 5 DE MANZANITA EN UNA EVIDENCIA 
+      // PERO EN OTRA EVIDENCIA REGISTRO 3 DE COCA 2 DE FANTA Y 8 DE MANZANITA SE SUMAN LAS VENTAS POR MARCA CORRESPONDIENTE.
      for(let x = 0; x < newCreadores.length; x++){
        for (let v = 0; v < newCreadores[x].marcas.length; v++){
           for ( let y = 0; y < newCreadores[x].ventasDinamica.length; y++){
@@ -189,10 +128,10 @@ class DinamicDetail extends Component{
           }
       }
      }
-
+     // AQUI SE HACE UN TOTAL DE VENTAS O UN TOTAL DE PUNTOS (DEPENDIENDO DE LA MODALIDAD DE LA DINAMICA) 
+     // POR CADA USUARIO DEPENDIENDO LAS VENTAS TOTALES QUE REGISTRO
      for (let ab = 0; ab < newCreadores.length; ab++){
       if(dinamic.modalidad === "Ventas"){
-        // Y SUMAMOS SUS VENTAS PARA SACAR UN TOTAL DE VENTAS POR USUARIO
         for (let cd = 0; cd < newCreadores[ab].marcas.length; cd++){
           newCreadores[ab].total += newCreadores[ab].marcas[cd].puntosUsuario
         }
@@ -202,8 +141,14 @@ class DinamicDetail extends Component{
         newCreadores[ab].total += newCreadores[ab].marcas[ef].puntosUsuario * newCreadores[ab].marcas[ef].puntosVentas
       }
      }
+     // ESTE IF ES PARA REVISAR SI EN EL RANKING O LOS DATOS QUE HACEN POSIBLE EL RANKING ESTA EL USUARIO ACTUAL
+     // SI SI ESTA QUIERO SABER CUANTOS PUNTOS O VENTAS EN TOTAL LLEVA EN ESTA DINÁMICA PARA A SU VEZ MOSTRARSELO AL USUARIO
+     // EN EL CASO DE LAS VENTAS S EMUESTRA UN DETALLE MAS A FONDO EN LA SECCION MIS VENTAS
+     if(newCreadores[ab]._id === idUser){
+      puntos = newCreadores[ab].total
     }
-       this.setState({newCreadores})
+    }
+       this.setState({newCreadores,puntos})
      })
      .catch(e=>console.log(e))
      this.setState({dinamic,marcas,chipData})
@@ -212,44 +157,7 @@ class DinamicDetail extends Component{
  }
   
 
-  getFile = e => {
-   const file = e.target.files[0];
-   const correo = `${JSON.parse(localStorage.getItem('user')).correo}`;
-   const date = new Date();
-   const date2 = String(date).slice(4,24)
-   const numberRandom = Math.random();
-   const number = String(numberRandom).slice(2,16)
-   const child = 'evidenceOf'+correo + date2 + number
-   //aqui lo declaro
-   const uploadTask = firebase.storage()
-   .ref("evidencias")
-   .child(child)
-   .put(file);
-   //aqui agreggo el exito y el error
-   uploadTask
-   .then(r=>{
-     const {evidencia} = this.state;
-     evidencia.archivo =  r.downloadURL;
-     this.setState({evidencia,faltaImagen:false})
-   })
-   .catch(e=>console.log(e)) //task
-   uploadTask.on('state_changed', (snap)=>{
-     const progresoImagen = (snap.bytesTransferred / snap.totalBytes) * 100;
-     this.setState({progresoImagen});
-   })
-  };
-
-
-  handleOpen = () => {
-    this.setState({open: true});
-  };
-  handleClose = () => {
-    const {chipData} =this.state;
-    for(let i = 0; i<chipData.length;i++){
-        chipData[i].ventas = 0
-    }
-    this.setState({open: false,evidencia:{},progresoImagen:0,boton:true,faltaImagen:true,chipData});
-  };
+// ABRIR Y CERRAR DIALOGOS INFORMATIVOS Y D ELA CREACION DE EVIDENCIAS
   handleOpen2 = () => {
     this.setState({open2: true});
   };
@@ -268,51 +176,9 @@ class DinamicDetail extends Component{
   handleClose4 = () => {
     this.setState({open4: false});
   };
-  onChangeEvidence = (e) => {
-    const field = e.target.name;
-    const value = e.target.value;
-    const {chipData} =this.state;
-    const {evidencia} = this.state;
-    for(let i = 0; i<chipData.length;i++){
-      if(field === chipData[i]._id._id){
-        chipData[i].ventas = value
-      }
-    }
-    evidencia.marcas = chipData;
-    this.setState({evidencia,chipData,boton:false})
-  }
-  onChange = (e) => {
-    const field = e.target.name;
-    const value = e.target.value;
-    const {evidencia} = this.state;
-    evidencia[field] = value;
-    this.setState({evidencia}); 
-  }
-  sendEvidencia = (e) => {
-    const {evidencia} = this.state;
-    let fecha = new Date()
-    evidencia.fecha = String(fecha).slice(0,15)
-    const idUser = `${JSON.parse(localStorage.getItem('user'))._id}`;
-    const idDinamica = this.state.dinamic._id;
-    const {dinamic} = this.state;
-    evidencia.creador = idUser;
-    evidencia.dinamica = idDinamica;
-    evidencia.modalidad = dinamic.modalidad;
-    evidencia.brand = dinamic.brand;
-    if(this.state.dinamic.checkEvidences === false){
-      evidencia.status = "Aprobada"
-    }
-    this.setState({evidencia});
-    createEvidence(this.state.evidencia)
-    .then(r=>{
-      this.handleClose();
-      this.handleOpen3();
-    })
-    .catch(e=>{
-      this.handleClose();
-      this.handleOpen4()
-    })
-  }
+
+  // LOS CHIPS QUE MUESTRAN LA MARCA QUE SE DEBE DE VENDER PUEDEN MOSTRAR MAS DETALLES ACERCA DE LA MARCA
+  // ESTA FUNCION LOGRA ESO, MUESTRA EL DETALLE DE LA MARCA SELECCIONADA
   marca = (marca) => {
     let {marcaDetalle} = this.state;
     this.handleOpen2()
@@ -320,60 +186,32 @@ class DinamicDetail extends Component{
     marcaDetalle.descripcion = marca.descripcion
     this.setState({marcaDetalle})
   }
-
+// MUESTRA ELRANKING DE LA DINAMICA
   verRanking = (e) =>{
     this.setState({verRanking:true})
   }
+  // OCULTA EL RANKING DE LA DINAMICA
   noVerRanking = (e) =>{
     this.setState({verRanking:false})
   }
-
+// REFRESCA LA PAGINA, ESTO ES PORQUE NECESITAMOS BORRAR LOS DATOS INGRESADOS EN EL DIALOGO DE LA EVIDENCIA
+// FUNCIONA PERO CREO QUE YA FUNCIONABA CON LO QUE HICE EN LA FUNCION DE HANDLECLOSE QUE HACIA QUE EL CHIPDATA.VENTAS SE IGUALARA A 0,
+// PERO CUANDOHICE EL DEPLOY NO ME FUNCIONO, PERO CREO QUE FUE PORQUE SE JUNTO CON UN ERROR DEL DEPLOY, EN FIN AHORITA FUNCIONA ASI 
+// PERO MAS ADELANTE SERIA BUENO QUITAR ESTE REFRESH
   refreshPage = () =>{
     this.handleClose3()
     window.location.reload()
   }
  
-  renderChip(data) {
-    return (
-     <div key={data._id.nombre}>
-      <Chip
-       style={styles2.chip}
-      >
-      <Avatar src={data._id.imagen} />
-        {data._id.nombre}
-      </Chip>
-      <TextField
-      onInput={(e)=>{ 
-        let dosDigitos = e.target.value 
-        dosDigitos = Math.max(0, parseInt(e.target.value,10) ).toString().slice(0,2)
-        e.target.value = Number(dosDigitos)
-      }}
-      min={0}
-      onChange={this.onChangeEvidence}
-      name={`${data._id._id}`}
-      type="number"
-      hintText="Ventas por Marca"
-      floatingLabelStyle={styles2.floatingLabelFocusStyle}
-      floatingLabelFocusStyle={styles2.floatingLabelFocusStyle}
-      errorText="Este campo es obligatorio"
-      errorStyle={styles2.errorStyle} 
-    />
-    <hr/>
-      </div>
-    );
+  goToSendEvidence = () =>{
+    let {dinamic} = this.state;
+    this.props.history.push(`/sendevi/${dinamic._id}`)
   }
+
+
   
   render(){
-    const {dinamic, marcas,marcaDetalle,newCreadores,verRanking} = this.state;
-    const actions = [
-      <RaisedButton 
-              disabled={ dinamic.imagen ? this.state.faltaImagen : this.state.boton}
-              onClick={this.sendEvidencia}  
-              label="Enviar" 
-              backgroundColor="#B71C1C"
-              labelColor="#FAFAFA"
-            />
-    ];
+    const {dinamic, marcas,marcaDetalle,newCreadores,verRanking,puntos} = this.state;
     const actions2 = [
       <RaisedButton 
               onClick={this.refreshPage}  
@@ -400,7 +238,8 @@ class DinamicDetail extends Component{
               subtitle="Modalidad de la Dinámica" 
               title={dinamic.modalidad} 
               
-            />  
+            />
+            <h5 className="puntajePorDinamica">{dinamic.modalidad === "Ventas" ? 'Ventas: ' + puntos  : ' Puntos: ' + puntos}</h5>
             <hr/>
             <b>{dinamic.modalidad === "Ventas" ? "Ventas requeridas por marca: " : "Puntos por unidad vendida: "}</b>     
             <br/><br/>
@@ -446,7 +285,7 @@ class DinamicDetail extends Component{
             </CardText>
             <CardActions>
               <FlatButton 
-                onClick={this.handleOpen} 
+                onClick={this.goToSendEvidence} 
                 label="Participar" 
                 fullWidth={false}  
                 backgroundColor='#B71C1C' 
@@ -463,61 +302,6 @@ class DinamicDetail extends Component{
               />
             </CardActions>  
           </Card>
-        <Dialog
-          title="Envia tu evidencia"
-          modal={false}
-          actions={actions}
-          open={this.state.open}
-          onRequestClose={this.handleClose}
-          autoScrollBodyContent={true}
-        >
-        <br/>
-        <div className="subrayadoImagen">
-          <b>{dinamic.imagen ? "Esta dinámica REQUIERE foto de tus ventas" : "Esta dinámica NO requiere foto de tus ventas"}</b>
-        </div>
-        <br/>
-        <div style={dinamic.imagen ? style.preview : style.hiddenImage}>
-        <FlatButton
-            label="Elige una imagen"
-            labelPosition="before"
-            style={styles2.uploadButton}
-            containerElement="label"
-            backgroundColor="#00897B"
-          > 
-            <input onChange={this.getFile} name="fotoPerfil" type="file" style={styles2.uploadInput} />
-          </FlatButton>
-          <br/>
-             <LinearProgress mode="determinate" value={this.state.progresoImagen} />
-             <span>{
-               this.state.progresoImagen >= 100 ? "Listo tu imagen se ha cargado correctamente!" 
-               : (this.state.progresoImagen > 0 && this.state.progresoImagen < 98 ? "Espera la imagen se está cargando..." 
-               : "La imagen tarda unos segundos en cargar")
-              }</span>
-         
-            <br/><br/>
-        </div>
-        <br/>
-            <TextField
-              style={style.textField} 
-              onChange={this.onChange} 
-              name="mensaje" 
-              floatingLabelText="Mensaje"
-              multiLine={true}
-              type="text"  
-              underlineShow={true}
-              floatingLabelStyle={styles2.floatingLabelFocusStyle}
-              floatingLabelFocusStyle={styles2.floatingLabelFocusStyle}
-              errorText="Este campo no es obligatorio"
-              errorStyle={styles2.errorStyle2} 
-              rowsMax={1}
-              maxLength={150}
-            />
-            <hr/>
-            <h6>Define cuantas ventas hiciste de cada marca:</h6>
-            <div style={styles2.wrapper}>
-              {this.state.chipData.map(this.renderChip, this)}
-            </div>
-        </Dialog> 
         <div>
         <Dialog
           modal={false}
@@ -526,7 +310,7 @@ class DinamicDetail extends Component{
           autoScrollBodyContent={true}
         >
         <div className="padreProfile">
-       <h6>Información adicional de {marcaDetalle.nombre}</h6>
+       <b>Información adicional de {marcaDetalle.nombre}</b>
        <hr/>
        {marcaDetalle.descripcion}
        <br/>

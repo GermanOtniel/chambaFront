@@ -19,7 +19,9 @@ class Notas extends Component{
     open:false,
     nota:{}
   }
-
+// ESTE COMPONENTE TRAE LAS NOTAS O MENSAJES QUE SE HAN CREADO, HAY DOS TIPOS DE MENSAJES, LOS GLOBALES Y LOS QUE SE CREAN CUANDO UNA
+// EVIDENCIA HA SIDO RECHAZADA, CUANDO SE CARGA EL COMPONENTE TRAEMOS LAS NOTAS QUE HAN SIDO CREADAS PARA ESE USUARIO Y LAS GLOBALES, CREO.
+// NO ESTOY SEGURO SI TAMBIEN SE REPRESENTAN LAS GLOBALES
   componentWillMount(){
     let {notas} = this.state;
     const id = `${JSON.parse(localStorage.getItem('user'))._id}`;
@@ -43,20 +45,27 @@ class Notas extends Component{
     })
     .catch(e=>console.log)
  }
+
+ // ABRIR Y CERRAR DIALOGOS INFORMATIVOS
 handleOpen = () => {
   this.setState({open: true});
 };
 handleClose = () => {
   this.setState({open: false});
 };
+
+// ABRIR UN MENSAJE O NOTA EN ESPECIFICO CUANDO S ELE DA CLIC A UN MENSAJE
 oneMessage = (nota) => {
   this.setState({nota})
   this.handleOpen()
 };
+
+// SI EL USUARIO DA CLIC EN EL NOMBRE D ELA DINAMICA PUEDE IR A ESA DINAMICA
 goToDinamic = (nota) => {
   this.props.history.push(`/dinamica/${nota.idd}`)
 };
-
+// SI ES UN MENSAJE GLOBAL SI DA CLIC EN DONDE DEBERIA DE IR EL NOMBRE DE LA DINAMICA
+// PUES TE LLEVA AL MENU GENERAL DE LAS DINAMICAS
 goToMenu = () => {
   this.props.history.push(`/dinamicas`)
 };

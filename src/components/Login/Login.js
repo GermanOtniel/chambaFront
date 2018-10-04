@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import Paper from 'material-ui/Paper';
-import { login,getNewPassword,googleUser } from '../../services/auth';
+import { login,getNewPassword, googleUserLogin } from '../../services/auth';
 import { Link } from 'react-router-dom';
 import Dialog from 'material-ui/Dialog';
 import TextField from 'material-ui/TextField';
@@ -9,7 +9,11 @@ import { GoogleLogin } from 'react-google-login';
 import './login.css'
 
 
-
+const customContentStyle = {
+  width: '100%',
+  maxWidth: 'none'
+  
+};
 
 class Login extends Component {
 
@@ -24,8 +28,11 @@ class Login extends Component {
     open3:false,
     open4:false
   }
+  // lo que se hace es ver si hay un usuario guardado en el local storage, si si usamos esos datos para autocompletar 
+  // el usuario y la contraseña para que el usuario no tenga necesidad de escribir nuevamente su contrasseña y correo
   componentWillMount(){
-    console.log('Sarabi Germán esta esforzándose...')
+    let date = new Date();
+    console.log(date)
     let usuarioGuardado;
     let hayUsuario = `${JSON.parse(localStorage.getItem('userLogged'))}`;
     if ( hayUsuario === "null" ){
@@ -41,6 +48,42 @@ class Login extends Component {
       this.setState({userLogged,boton:false,newUser:userLogged})
     }
  }
+
+ // ABRIR Y CERRAR DIALOGOS INFORMATIVOS
+
+ handleOpen = () => {
+  this.setState({open: true});
+};
+handleClose = () => {
+  this.setState({open: false});
+};
+handleOpen2 = () => {
+  this.setState({open2: true});
+};
+handleClose2 = () => {
+  this.setState({open2: false});
+};
+handleOpen3 = () => {
+  this.setState({open3: true});
+};
+handleClose3 = () => {
+  this.setState({open3: false});
+};
+handleOpen4 = () => {
+  this.setState({open4: true});
+};
+handleClose4 = () => {
+  this.setState({open4: false});
+};
+handleOpen5 = () => {
+  this.setState({open5: true});
+};
+handleClose5 = () => {
+  this.setState({open5: false});
+};
+
+ // ESTE ONCHANGE SE USA PARA GUARDAR EL CORREO Y LA CONTRASEÑA QUE EL USUARIO ESTA INGRESANDO
+ // CORROBORAMOS QUE ES UN CORREO VALIDO Y SI SI DESBLOQUEAMOS EL BOTON DE INGRESAR
   onChange = (e) => {
     const field = e.target.name;
     const value = e.target.value;
@@ -54,6 +97,8 @@ class Login extends Component {
     }
     this.setState({newUser}); 
   }
+
+  // ESTE ES EL ONCHANGE PARA CUANDO ALGUIEN OLVIDO SU CONTRAEÑA Y REQUIERE UNA TEMPORAL
   onChange2 = (e) => {
     const field = e.target.name;
     const value = e.target.value;
@@ -61,6 +106,9 @@ class Login extends Component {
     correo[field] = value;
     this.setState({correo}); 
   }
+  // SE USA PARA ENVIAR LOS DATOS DEL USUARIO QUE ESTA TRATANDO DE INGRESAR
+  // SE ENVIA EL NEWUSER QUE SE TIENE EN EL STATE Y UNA VEZ QUE YA NOS TRAE UN USUSARIO DE VUELTA
+  // PUES LE DAMOS INGRESO A LA APP
   sendUser = (e) => {
     localStorage.setItem('userLogged', JSON.stringify(this.state.newUser))
     e.preventDefault();
@@ -72,21 +120,34 @@ class Login extends Component {
       this.handleOpen()
     })
   }
+  // ESTA ES UNA FUNCION LA CUAL NOS INDICA SI OCURRE UN ERROR MIENTRAS EL USUARIO QUIERE INGRESAR CON 
+  // UNA CUENTA DE GOOOGLE.
   onFailure = (error) => {
     console.log(error);
   };
+
+  // LA FUNCION QUE NOS AYUDA A SACAR LOS DATOS QUE ESTAN GUARDADOS EN EL CACHE DEL NAVEGADOR DEL USUARIO
+  // NOS TRAE VARIOS DATOS COMO NOMBRE, CORREO, GOOGLEID, LO MAS IMPORTANTE Y LO UNICO QUE USAMOS ES EL CORREO, UNA VEZ QUE NOS
+  // DA UN CORREO PUES LO GUARDAMOS EN NUESTRA BASE DE DATOS Y LO DEJAMOS PASAR A LA APP
   googleResponse = (response) => {
       const {user} = this.state;
       user.nombreUsuario = response.profileObj.name;
       user.correo = response.profileObj.email;
       user.googleId = response.profileObj.googleId
       this.setState({user});
-      googleUser(this.state.user)
-          .then(user=>{
-          this.props.history.push(`/profile/${user._id}`);
+      googleUserLogin(this.state.user)
+          .then(r=>{
+            if(r === "NER"){
+              this.handleOpen()
+            }
+            else{
+            this.props.history.push(`/profile/${user._id}`);
+            }
       })
       .catch(e=>console.log(e))
   };
+  // CUANDO NOTA QUE SE DA CLICK EN ALGUN TEXTFIELD DE CORREO O CONTRASEÑA DEL FORMULARIO DE INICAR SESION ENTONCES CAMBA LOS VALORES 
+  // DE ESOS TEXTFIELDS POR UN STRING VACIO "" PARA QUE EL USUARIO PUEDA ESCRIBIR ALGO NUEVO
   onCheck = (e) =>{
     let {userLogged} = this.state;
     let {newUser} = this.state;
@@ -100,40 +161,14 @@ class Login extends Component {
       newUser.password = ""
       this.setState({userLogged,newUser,boton:true})
   }
+
+  // SE NECESITABA UN TERNARIO Y CREAMOS UNA FUNCION QUE REALMENTE NO HICIERA NADA
   nada = (e) =>{
     //jajaja no hace nada pero a la vez si...esto es la programacion beibe!!!
   }
-  handleOpen = () => {
-    this.setState({open: true});
-  };
-  handleClose = () => {
-    this.setState({open: false});
-  };
-  handleOpen2 = () => {
-    this.setState({open2: true});
-  };
-  handleClose2 = () => {
-    this.setState({open2: false});
-  };
-  handleOpen3 = () => {
-    this.setState({open3: true});
-  };
-  handleClose3 = () => {
-    this.setState({open3: false});
-  };
-  handleOpen4 = () => {
-    this.setState({open4: true});
-  };
-  handleClose4 = () => {
-    this.setState({open4: false});
-  };
-  handleOpen5 = () => {
-    this.setState({open5: true});
-  };
-  handleClose5 = () => {
-    this.setState({open5: false});
-  };
 
+// FUNCION PARA CREAR UNA CONTRASEÑA TEMPORAL, SOBRETODO CUANDO UN USUARIOOLVIDA SU CONTRASEÑA
+// SE HACE UNA CONEXIÓN AL BACKEND CON EL SERVICIO getNewPassword
   getNewPassword = () =>{
     let {correo} = this.state;
     getNewPassword(correo)
@@ -149,7 +184,14 @@ class Login extends Component {
   }
   render() {
     const {userLogged,newUser} = this.state;
-
+    const actions = [
+      <RaisedButton 
+        onClick={this.getNewPassword}  
+        label="Enviar" 
+        backgroundColor="#B71C1C"
+        labelColor="#FAFAFA"
+      />,
+    ]
     return (
       
       <div className="app" >
@@ -219,9 +261,13 @@ class Login extends Component {
           title="Restablecer contraseña"
           modal={false}
           open={this.state.open2}
+          actions={actions}
+          contentStyle={customContentStyle}
           onRequestClose={this.handleClose2}
-          autoScrollBodyContent={true}      
+          autoScrollBodyContent={true} 
+          className="dialogScroll" 
         > 
+        <div>
         Parece que has olvidado tu contraseña, por favor Ingresa el correo electrónico con el cual te regístraste, ya que a esa dirección te mandaremos 
         la contraseña temporal con la cual podrás volver a Ingresar a tu cuenta.
         <br/>
@@ -232,13 +278,7 @@ class Login extends Component {
               type="email"  
               underlineShow={true}
             />
-            <br/>
-            <RaisedButton 
-              onClick={this.getNewPassword}  
-              label="Enviar" 
-              backgroundColor="#B71C1C"
-              labelColor="#FAFAFA"
-            />
+        </div>
         </Dialog>  
 
         </div> 

@@ -19,3 +19,18 @@
   text-align: center;
   margin: 10% auto 
 }
+.puntajePorDinamica{
+  text-align: center;
+  background-color: #bc960b
+}
+.chipsVetas{
+  text-align: left;
+}
+.sendEvidencia{
+  background-color: #00897B;
+  color:white;
+  font-size: 1rem
+}
+.h5EnviarEvi{
+  margin-top: 3%
+}

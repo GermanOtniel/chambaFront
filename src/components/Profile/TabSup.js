@@ -23,7 +23,11 @@ class TabSup extends Component{
     passwordd:"",
     correoo:""
   }
-
+// ESTE COMPONENTE ES EL MENU QUE SE DESPLIEGA DE LADO DERECHO
+// LO QUE HACE ES DAR UNA SERIE DE BOTONES QUE NOS PUEDE LLEVAR A DISTINOTS COMPONENTES COMO MIS VENTAS(VENTAS)
+// BUZON(NOTAS), ENVIADAS(EVIDENCIAS)
+// TAMBIEN A LOS USUARIOS QUE HAN INGRESADO CON CORREO Y CONTRASEÑA LES DA LA OPCION DE CAMBIARLA
+// SI UN USUARIO INGRESO CON GMAIL NO L EAPARECE ESA FUNCION 
   componentWillMount(){
     const userLogged = `${JSON.parse(localStorage.getItem('userLogged'))}`;
     if(userLogged !== "null"){
@@ -36,6 +40,7 @@ class TabSup extends Component{
     }
   }
 
+  // ES PARA CUANDO ESTAN CREANDO UNA CONTRASEÑA NUEVA
   onChange = (e) => {
     let {passwordd} = this.state;
     const field = e.target.name;
@@ -62,14 +67,15 @@ class TabSup extends Component{
       this.setState({passwordCoinciden:true})
     }
    }
-   
     this.setState({cambios}); 
   }
 
+  // PARA ABRIR Y CERRAR EL MENU DESPLEGABLE
   handleToggle = () => this.setState({open: !this.state.open});
 
   handleClose = () => this.setState({open: false});
 
+  // ABRIR Y CERRA EL DIALOGO PARA INGRESAR Y CAMBIAR TU CONTRASEÑA
   handleOpen = () => {
     this.setState({open2: true});
   };
@@ -77,9 +83,13 @@ class TabSup extends Component{
     this.setState({open2: false});
   };
 
+  // ABRIR EL DIALOGO PARA CAMBIAR CONTRASEÑA, ESTA DE MAS ESTA FUNCION PERO LE VAMOS A PERDONAR LA VIDAPOR AHORA
   changePassword = () =>{
     this.handleOpen()
   }
+
+  // ENVIAR LA NUEVA CONTRASEÑA AL BACKEND
+  // TODOS LOS SERVICIOS SE PUEDEN RASTREAR MUY FACIL POR MEDIO DE LAS RUTAS A LAS CUALES SE DIRIJEN LOS SERVICIOS
   sendNewPassword =()=>{
     let {correoo,cambios} = this.state;
     let body = {
@@ -92,6 +102,7 @@ class TabSup extends Component{
     })
     .catch(e=>console.log(e))
   }
+  
   render(){
     const actions2 = [
       <FlatButton

@@ -1,7 +1,7 @@
 //production 
-const baseURL = process.env.REACT_APP_BASE_URL;
+//const baseURL = process.env.REACT_APP_BASE_URL;
 // development
-//const baseURL = "http://localhost:3000"
+const baseURL = "http://localhost:3000"
 
 export function googleUser(userData){
     return fetch(baseURL + '/auth/google', {
@@ -19,6 +19,23 @@ export function googleUser(userData){
         localStorage.setItem('user', JSON.stringify(user))
         return user;
     });
+}
+export function googleUserLogin(userData){
+  return fetch(baseURL + '/auth/login/google', {
+      method:'post',
+      headers:{
+          "Content-Type": "application/json"
+      },
+      body: JSON.stringify(userData)
+  })
+  .then(res=>{
+      if(!res.ok) return Promise.reject(res);
+      return res.json();
+  })
+  .then(user=>{
+      localStorage.setItem('user', JSON.stringify(user))
+      return user;
+  });
 }
 export function signup(userData){
     return fetch(baseURL + '/auth/signup', {

@@ -22,8 +22,9 @@ h1,h2,h3,h4,h5,h6,b,p,span,big{
   margin: 10% auto auto auto;
   font-family: 'Lato', sans-serif;
 }
-.padreProfile > h4 {
-  background-color: #bc960b
+.padreProfile > h6 {
+  background-color: #bc960b;
+  font-size: 1.1rem
 }
 .logoMenu{
   text-align: center;
@@ -37,4 +38,12 @@ h1,h2,h3,h4,h5,h6,b,p,span,big{
 }
 .tabAppBar{
   color: red
+}
+.icon{
+  margin-right: 5%
+}
+.imgEditProf{
+  width: 50%;
+  height: 75%;
+  margin: -3% auto -3% auto;
 }

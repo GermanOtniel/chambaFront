@@ -3,6 +3,7 @@ import Paper from 'material-ui/Paper';
 import {signup} from '../../services/auth';
 import { Link } from 'react-router-dom';
 import Dialog from 'material-ui/Dialog';
+import {RadioButton, RadioButtonGroup} from 'material-ui/RadioButton';
 import TextField from 'material-ui/TextField';
 import RaisedButton from 'material-ui/RaisedButton';
 import { GoogleLogin } from 'react-google-login';
@@ -17,76 +18,110 @@ class Signup extends Component {
   state={
     newUser:{},
     user:{},
-    boton:true,
+    botonEnviar:true,
+    botonGoogle:true,
     mensajeContraseñas:"",
     open:false
   }
 
-
+  // guardar la info QUE EL USUARIO QUE QUIERE REGISTRARSE ESTA INGRESANDO
   onChange = (e) => {
     const field = e.target.name;
     const value = e.target.value;
-    const {newUser} = this.state;
+    let {newUser} = this.state;
     newUser[field] = value;
-    newUser.correo = newUser.correo.toLowerCase()
-    if(newUser.correo.includes('@') && newUser.correo.includes('.') ){
-      this.setState({boton:false})
+    if(newUser.terminosCondiciones === 'true'){
+      this.setState({botonGoogle:false}) 
     }
-    else if(!newUser.correo.includes('@') || !newUser.correo.includes('.') ){
-      this.setState({boton:true})
+    else if(newUser.terminosCondiciones !== 'true'){
+      this.setState({botonGoogle:true}) 
+    }
+    if(newUser.correo !== undefined){
+      if(newUser.terminosCondiciones === 'true' && newUser.correo.includes('@') && newUser.correo.includes('.')){
+        this.setState({botonEnviar:false}) 
+      }
+      else if(newUser.terminosCondiciones !== 'true' && !newUser.correo.includes('@') && !newUser.correo.includes('.')){
+        this.setState({botonEnviar:true}) 
+      }
     }
     this.setState({newUser}); 
   }
+
+  // REVISAR SI LAS CONTRASEÑAS SON IDENTICAS O IGUALES
   onChangeContraseñas = (e) => {
     const field = e.target.name;
     const value = e.target.value;
-    const {newUser} = this.state;
-    let {mensajeContraseñas} = this.state;
+    let {newUser,mensajeContraseñas} = this.state;
     newUser[field] = value;
       if(newUser.password !== newUser.password2 ){
         mensajeContraseñas = "Tus contraseñas no coinciden..."
-        this.setState({mensajeContraseñas,boton:true})
+        this.setState({mensajeContraseñas})
       }
       else if(newUser.password === newUser.password2 && newUser.password !== "" && newUser.password2 !== "" ){
         mensajeContraseñas = "Bien, tus contraseñas SI coinciden"
-        this.setState({mensajeContraseñas,boton:false})
+        this.setState({mensajeContraseñas})
       }
+
     this.setState({newUser}); 
   }
+
+  // SE ENVIAN LOS DATOS DE REGISTRO PARA CREAR UN NUEVO USUARIO, SI YA HAY UN USUARIO CREADO  
+  // CON ESE CORREO SE LE DICE QUE NEEE Q YA HAY UN USUARIO GUARDADO CON ESE CORREO
   sendUser = (e) => {
     localStorage.setItem('userLogged', JSON.stringify(this.state.newUser))
-    e.preventDefault();
-    signup(this.state.newUser)
-    .then(r=>{
-      if(r.message){
-        this.handleOpen()
+    let { newUser } = this.state;
+    if(newUser.correo !== undefined){
+      if(newUser.correo.includes('@') && newUser.correo.includes('.')){
+        newUser.correo = newUser.correo.toLowerCase()
+        signup(this.state.newUser)
+        .then(r=>{
+          if(r.message){
+            this.handleOpen()
+          }
+          else{
+          this.props.history.push(`/profile/${r._id}`);
+          }
+        })
+        .catch(e=>console.log(e))
       }
       else{
-      this.props.history.push(`/profile/${r._id}`);
+        this.handleOpen()
       }
-    })
-    .catch(e=>console.log(e))
+    }
+    else{
+      this.handleOpen()
+    }
   }
+
+  // ES POR SI HAY ALGUN ERROR CON LA AUTENTICACION POR MEDIO DE GOOGLE
   onFailure = (error) => {
     console.log(error);
   };
+
+  // PARA SACAR LOS DATOS DEL CACHE DEL USUARIO QUE ESTA INTENTANDO REGISTRARSE CON GOOGLE
+  // CUANDO SE TIENEN LOS DATOS SE MANDAN AL BACKEND PARA QUE PROCEDA CON EL REGISTRO Y CREACION DE UN USUARIO NUEVO
   googleResponse = (response) => {
-      const {user} = this.state;
+      const {user,newUser} = this.state;
       user.nombreUsuario = response.profileObj.name;
       user.correo = response.profileObj.email;
       user.googleId = response.profileObj.googleId
+      user.terminosCondiciones = newUser.terminosCondiciones;
       this.setState({user});
       googleUser(this.state.user)
           .then(user=>{
           this.props.history.push(`/profile/${user._id}`);
-  })
+      })
   };
+
+  // ABRIR Y CERRAR DIALOGOS 
   handleOpen = () => {
     this.setState({open: true});
   };
   handleClose = () => {
     this.setState({open: false});
   };
+
+
   render() {
     const {mensajeContraseñas} = this.state;
     return (
@@ -94,7 +129,6 @@ class Signup extends Component {
       <div className="paper2">
         <Paper>
           <img className="imgLogin" src="https://firebasestorage.googleapis.com/v0/b/filetest-210500.appspot.com/o/testing%2Flogo1.5.png?alt=media&token=3288401a-902f-4601-a984-e564365bd3ed" alt="Loguito"/>
-        <br/>
         <h3>Regístrate</h3>
         <TextField
           hintText="Correo electrónico"
@@ -102,7 +136,6 @@ class Signup extends Component {
           name="correo"
           onChange={this.onChange}
         />
-        <br/>
         <TextField
           hintText="Tu contraseña"
           floatingLabelText="Tu contraseña"
@@ -110,7 +143,6 @@ class Signup extends Component {
           name="password"
           onChange={this.onChangeContraseñas}
         />
-        <br/>
         <TextField
           hintText="Tu contraseña"
           floatingLabelText="Tu contraseña"
@@ -122,25 +154,37 @@ class Signup extends Component {
           <b style={mensajeContraseñas === "Bien, tus contraseñas SI coinciden" ? {color:'green'} : {color:'red'}} className="msjContraseñas">{mensajeContraseñas}</b>
         </div>
         <div className="hijoPaper">
-        <br/>
         <RaisedButton 
         onClick={this.sendUser} 
         label="ENVIAR" 
         backgroundColor="#0D47A1" 
         labelColor="#FAFAFA" 
         className="botonIngresar"
-        disabled={this.state.boton} 
+        disabled={this.state.botonEnviar} 
         />
+        <br/><br/>
+        <div>
+          <div style={{display:'flex',justifyContent:'center'}} >
+          <RadioButtonGroup onChange={this.onChange} name="terminosCondiciones" defaultSelected="not_light">
+          <RadioButton
+            value={true}
+          />
+        </RadioButtonGroup>
+        <b style={{fontSize:'12px',marginTop:'3px'}}>Acepto <a href="http://bit.ly/unocincoprivacidad">Términos y Condiciones</a></b>
+        </div>
+        </div>
+ 
         <hr/>
         <h5 className="registrate">Si ya estás registrado <Link to="/" className="linkReg">Inicia Sesión</Link></h5>
         <div>
         <GoogleLogin
           clientId={process.env.REACT_APP_GOOGLEID}
-          buttonText="Ingresa con Google"
+          buttonText="Regístrate con Google"
           onSuccess={this.googleResponse}
           onFailure={this.onFailure}
           className="botonGoogleLogin"
-        />
+          disabled={this.state.botonGoogle} 
+          />
         </div> 
         </div>
         </Paper>
@@ -207,8 +251,8 @@ class Signup extends Component {
           onRequestClose={this.handleClose}
           autoScrollBodyContent={true}      
         > 
-         Ups, algo salió mal, parece ser que el correo que quieres registrar ya ha sido utilizado en el pasado. <br/><br/>
-         Te recomendamos usar otro correo electrónico.
+         Ups, algo salió mal, parece ser que el correo que quieres registrar ya ha sido utilizado en el pasado ó no es válido. <br/><br/>
+         Te recomendamos revisar el correo electrónico que estas ingresando.
         </Dialog>  
 
         </div> 

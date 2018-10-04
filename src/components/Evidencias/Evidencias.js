@@ -20,7 +20,9 @@ class Evidencias extends Component{
     open:false,
     marcasVentas:[]
   }
-
+// el proposito de este compoNENTE ES MOSTRARLE AL USUARIO LAS EVIDENCIAS QUE HA MANDADO PARA QUE PUEDA OBSERVAR LO QUE 
+// MANDO Y QUE SI AUN NO SE LE DAN SUS VENTAS O PUNTOS ES PORQUE LA EVIDENCIA QUE MANDO AUN ESTA PENDIENTE ES DECIR APROBANDOSE
+// LO QUE HACEMOS ES TRAER TODAS LAS EVIDENCIAS QUE ESE USUARIO HA HECHO Y QUE ESTEN EN STATUS PENDIENTE 
   componentWillMount(){
     const id = `${JSON.parse(localStorage.getItem('user'))._id}`;
     getEvidencesByUser(id)
@@ -34,16 +36,14 @@ class Evidencias extends Component{
     })
     .catch(e=>console.log(e))
    }
-  //  onClick={()=>this.goToDinamic(nota)}
-
+// ABRIR Y CERRAR DIALOGOS
   handleOpen = () => {
     this.setState({open: true});
   };
-  
   handleClose = () => {
     this.setState({open: false});
   };
-  
+  // SE MANDA LA INFORMACIÓN DE LA EVIDENCIA A LA CUAL EL USUARIO HA HECHO CLICK
   oneMessage = (evidencia) => {
     let {marcasVentas} = this.state;
     marcasVentas = evidencia.marcas;

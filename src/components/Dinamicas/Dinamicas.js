@@ -29,6 +29,13 @@ class Dinamica extends Component{
    open:true,
    dinamicas:false
   }
+
+  // SE REVISA SI EL USUARIO CUENTA CON UN CENTRO DE CONSUMO YA SELECCIONADO
+  // SI YA TIENE UN CENTRO DE CONSUMO SE MANDA EL ID DEL CENTRO D ECONSUMO 
+  // PARA QUE NOS TRAIGA LAS DINAMICAS QUE CORRESPONDEN A SU CENTRO DE CONSUMO
+  // SINO TIENE UN CENTRO DE CONSUMO SELECCIONADO PUES SE LE DICE QUE DEBE DE HACER.
+  // EN DADO CASO QUE YA HAYA SELECCIONADO UN CENTRO DE CONSUMO PERO NO HAYA DINAMICAS PARA SU CENTRO DE CONSUMO 
+  // TAMBIEN S ELE DICE QUE SUCEDE
   componentWillMount(){
     let {centro} = this.state;
     let {dinamicas} = this.state;
@@ -55,18 +62,24 @@ class Dinamica extends Component{
       .catch(e=>console.log(e))
     }  
  }
+
+ // ESTAS FUNCIONES ABREN Y CIERRAN DIALOGOS INFORMATIVOS
  handleClose = () => {
   this.setState({centro: false});
-};
-handleClose2 = () => {
+ };
+ handleClose2 = () => {
   this.setState({dinamicas: false});
-};
-dinamic=(dinamic)=>{
+ };
+
+ //ESTA FUNCION NOS LLEVA A UNA DINAMICA EN ESPECIAL Y MANDAMOS SU ID MEDIANTE LOS PARAMS
+ dinamic=(dinamic)=>{
     this.props.history.push(`/dinamica/${dinamic._id}`);
-}
-outOfDinamics=()=>{
+ }
+
+ // CUANDO NO HAY DINAMICAS O CENTRO DE CONSUMO EL BOTON QUE SE HABILITA EN EL DIALOGO INFORMATIVO LLEVA AL USUARIO A SU PERFIL
+ outOfDinamics=()=>{
   this.props.history.push(`/profile/${JSON.parse(localStorage.getItem('user'))._id}`);
-}
+ }
   render(){
     const {dinamics,centro} = this.state;
     const actions = [
@@ -115,7 +128,7 @@ outOfDinamics=()=>{
         >
           Lo lamentamos aún no hay Dinámicas existentes en tu Centro de Consumo.
           <br/><br/>
-          <b>Pero no te preoucupes esto no sule pasar muy seguido y seguro pronto habra dinámicas, ¡regresa pronto!</b>
+          <b>Pero no te preocupes esto no suele pasar muy seguido y seguro pronto habra dinámicas, ¡regresa pronto!</b>
         </Dialog>
           </div>
         <div style={styles.root}>
