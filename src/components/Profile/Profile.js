@@ -24,7 +24,6 @@ class Profile extends Component{
     id: null,
     user: {},
     centers:[],
-    centroConsumo:'',
     open2:false,
     newNotification:{},
     telefono:"",
@@ -62,9 +61,10 @@ class Profile extends Component{
       open3 = true
       this.setState({open3})
     }
-     let centroConsumo = user.centroConsumo.nombre;
-     user.centro = user.centroConsumo.nombre
-     this.setState({user,centroConsumo})
+    if(user.centroConsumo){
+      user.centro = user.centroConsumo.nombre
+    }
+    this.setState({user})
    })
    .catch(e=>console.log(e));
  }
@@ -107,8 +107,8 @@ class Profile extends Component{
   }
 
   goToEdit = () =>{
-    let {user} = this.state;
-    this.props.history.push(`/edit/${user._id}`);
+    let {id} = this.state;
+    this.props.history.push(`/edit/${id}`);
   }
   render(){
     const {user} =this.state;

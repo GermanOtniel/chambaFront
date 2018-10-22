@@ -57,7 +57,6 @@ class EditProfile extends Component{
     // NO SE LE HA MANDADO CORREO PUES LE MANDAMOS UN CORREO PARA QUE CONFIRME SU CUENTA, EL CORREO ENVIA LA DIRECCION DE NUESTRO BACKEND
     // Y POSTERIORMENTE EN EL BACKEND SE CREARA UN CORREO Y UN LINK PARA QUE CUANDO EL USUARIO DE CLICK EN ESE LINK SU CIENTA SE CONFIRME
     // MIENTRAS NO CONFIRME SU CUENTA EL USUARIO UN DIALOGO LE SEGUIRA APARECIENDO Y RECORDANDO QUE NO HA CONFIRMADO SU CUENTA
-
     // TAMBIEN TRAEMOS TODOS LOS CENTROS QUE EXISTEN EN NUESTRA APP PARA QUE ELIJA ALGUNO DE ELLOS, COMO EL CENTRO DE CONSUMO EN EL QUE TRABAJA
   componentWillMount(){
     const id = this.props.match.params.id
@@ -119,6 +118,7 @@ class EditProfile extends Component{
     const newProfile = this.state.newProfile;
     editProfile(newProfile,id)
     .then(user=>{
+      localStorage.setItem('user', JSON.stringify(user))
       this.props.history.push(`/profile/${user._id}`)
     })
     .catch(e=>console.log(e)) 

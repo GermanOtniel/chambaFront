@@ -31,8 +31,7 @@ class Login extends Component {
   // lo que se hace es ver si hay un usuario guardado en el local storage, si si usamos esos datos para autocompletar 
   // el usuario y la contraseña para que el usuario no tenga necesidad de escribir nuevamente su contrasseña y correo
   componentWillMount(){
-    let date = new Date();
-    console.log(date)
+    console.log('VAMONOS A LA VISITA!!!!')
     let usuarioGuardado;
     let hayUsuario = `${JSON.parse(localStorage.getItem('userLogged'))}`;
     if ( hayUsuario === "null" ){
@@ -75,12 +74,7 @@ handleOpen4 = () => {
 handleClose4 = () => {
   this.setState({open4: false});
 };
-handleOpen5 = () => {
-  this.setState({open5: true});
-};
-handleClose5 = () => {
-  this.setState({open5: false});
-};
+
 
  // ESTE ONCHANGE SE USA PARA GUARDAR EL CORREO Y LA CONTRASEÑA QUE EL USUARIO ESTA INGRESANDO
  // CORROBORAMOS QUE ES UN CORREO VALIDO Y SI SI DESBLOQUEAMOS EL BOTON DE INGRESAR
@@ -304,7 +298,6 @@ handleClose5 = () => {
         > 
          El correo electrónico que ingresaste no es válido.
         </Dialog>  
-
         </div> 
      </div>
      

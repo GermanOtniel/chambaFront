@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
-import { getSingleDinamic } from '../../services/dinamicas';
+import { getSingleDinamic,sendWinner } from '../../services/dinamicas';
+import { getVentasByDinamicAndUser } from '../../services/ventas';
 import { getEvidencesByDinamic } from '../../services/evidencias';
 import TabSup from '../Profile/TabSup';
 import {Card, CardActions, CardMedia, CardTitle, CardText} from 'material-ui/Card';
@@ -32,12 +33,19 @@ const styles = {
     marginTop: 16,
   }
 };
-
+const style2 = {
+  margin: 5,
+  float: 'right'
+};
 
 const label = {
   color:'white'
 }
-
+const customContentStyle = {
+  width: '100%',
+  maxWidth: 'none'
+  
+};
 
 class DinamicDetail extends Component{
 
@@ -54,7 +62,13 @@ class DinamicDetail extends Component{
     open4:false,
     newCreadores:[],
     verRanking: false,
-    puntos:0
+    puntos:0,
+    algo:true,
+    newArray:[],
+    open5:false,
+    open6:false,
+    miDetalle:[],
+    open:false
   }
 
   // AQUI SE TRAEN LOS DETALLES DE UNA DINAMICA, PERO TAMBIEN SE TRAEN LAS EVIDENCIAS QUE HA GENERADO ESA DINAMICA
@@ -158,6 +172,12 @@ class DinamicDetail extends Component{
   
 
 // ABRIR Y CERRAR DIALOGOS INFORMATIVOS Y D ELA CREACION DE EVIDENCIAS
+  handleOpen = () => {
+    this.setState({open: true});
+  };
+  handleClose = () => {
+    this.setState({open: false});
+  };
   handleOpen2 = () => {
     this.setState({open2: true});
   };
@@ -175,6 +195,20 @@ class DinamicDetail extends Component{
   };
   handleClose4 = () => {
     this.setState({open4: false});
+  };
+  handleOpen5 = () => {
+    this.setState({open5: true});
+  };
+  handleClose5 = () => {
+    let {newArray} = this.state;
+    newArray.pop()
+    this.setState({open5: false,newArray});
+  };
+  handleOpen6 = () => {
+    this.setState({open6: true});
+  };
+  handleClose6 = () => {
+    this.setState({open6: false});
   };
 
   // LOS CHIPS QUE MUESTRAN LA MARCA QUE SE DEBE DE VENDER PUEDEN MOSTRAR MAS DETALLES ACERCA DE LA MARCA
@@ -208,10 +242,117 @@ class DinamicDetail extends Component{
     this.props.history.push(`/sendevi/${dinamic._id}`)
   }
 
-
+  // TRAER EL PERFORMANCE DE ESA DINAMICA DE UN USUARIO SIEMPR EY CUANDO SEA 
+  // UNA DINAMICA DE MODALIDAD VENTAS
+  getMySolds = (e) =>{
+    let {dinamic} = this.state;
+    let idUser = `${JSON.parse(localStorage.getItem('user'))._id}`;
+    getVentasByDinamicAndUser(dinamic._id,idUser)
+    .then(ventas=>{
+      let {algo} = this.state;
+      //DINAMICAS EN LAS QUE EL USUARIO TIENE VENTAS APROBADAS 
+            let dinamicasArray = ventas.map(venta=>venta.dinamica);
+      // DONDE VOY A GUARDAR LAS DINAMICAS QUE YA NO SE REPITEN
+            var {newArray} = this.state;
+            // NO SE QUE HACE PERO ES NECESARIO
+            var lookupObject  = {};
+      // EL CICLO QUE RECORRE EL ARRAY ORIGINAL DE DINAMICAS EN LA CUAL AUN HAY REPETIDAS
+            for(var i in dinamicasArray) {
+              lookupObject[dinamicasArray[i]['_id']] = dinamicasArray[i];
+            }
+      // EL CICLO QUE PUSHEA AL OBJETO DONDE SE GUARDAN LAS DINAMICAS NO REPETIDAS
+            for(i in lookupObject) {
+               newArray.push(lookupObject[i]);
+            }    
+      // HASTA AQUI newArray LLEVA TODAS LAS DINAMICAS UNICAS, ES DECIR YA 
+      //NO HAY DINAMICAS REPETIDAS.
+      //AHORA LOS SIGUIENTES 3 CICLOS HACEN:
+      // 1) RECOORE EL ARRAY DE DINAMICAS UNICAS
+      // 2) RECORRE ELARRAY DE VENTAS
+      // 3) COMPARA LOS IDs DE LAS DINAMICAS CON LOS IDS DE A QUE DINAMICA PERTENECEN LAS VENTAS
+      // SI ALGUN ID COINCIDE ESA VENTA SE INSERTA A ESA DINAMICA
+            for(var x = 0; x<newArray.length;x++){
+              for(var j = 0; j<ventas.length;j++){
+                if( newArray[x]._id === ventas[j].dinamica._id ){
+                  for(let k = 0; k < ventas[j].marcas.length; k++){
+                    newArray[x].ventas.push(ventas[j].marcas[k])
+                  }
+                }
+              }
+            }
+      // HASTA AQUI newArray YA LLEVA LAS DINAMICAS UNICAS EXISTENTES Y CADA DINAMICA
+      // LLEVA LAS VENTAS QUE LE CORRESPONDEN
+      
+      // AHORA VIENE SACAR LOS TOTALES DE VENTAS DE CADA DINAMICA.
+      // 1) RECORREMOS EL ARRAY DE DINAMICAS UNICAS
+      // 2) CUANDO ESTAMOS DENTRO DE CADA DINAMICA, RECORREMOS EL ARRAY DE marcaPuntosVentas
+      //EN DONDE ESTAN LAS MARCAS PARTICIPANTES DE ESA DINAMICA JUNTO CON LAS METAS DE VENTA DE CADA PRODUCTO
+      // 3) DESPUES RECORREMOS EL ARRAY DE ventas LOGRADAS POR EL USUARIO Y HACEMOS LA COMPARACION NUEVAMENTE,
+      // ESTA COMPARACION LA HACEMOS POR EL ID DE LA MARCA, SI ESTE COINCIDE SUMALE LAS VENTAS
+      // Y PONLE NOMBRE TAMBIEN A ESA MARCA
+            for(let f = 0; f < newArray.length; f++){
+              for( let b = 0; b < newArray[f].marcaPuntosVentas.length; b++){
+                for(let n = 0; n < newArray[f].ventas.length; n++){
+                  if(newArray[f].marcaPuntosVentas[b]._id === newArray[f].ventas[n]._id._id){
+                    newArray[f].marcaPuntosVentas[b].puntosUsuario += newArray[f].ventas[n].ventas
+                    newArray[f].marcaPuntosVentas[b].nombre = newArray[f].ventas[n]._id.nombre
+                    newArray[f].marcaPuntosVentas[b].foto = newArray[f].ventas[n]._id.imagen
+                    algo = false
+                  }
+                  // PARA HABILITAR EL BOTON DE RECLAMAR PREMIO NECESITAMOS VERIFICAR QUE LAS VENTAS QUE HA REALIZADO UN USUARIO 
+                  // DE UNA MARCA CUMPLAN CON LA META DE VENTAS PARA ESA MARCA, ES POR ESO QUE NOS ADENTRAMOS EN CADA MARCA, 
+                  // VERIFICAMOS SI LAS VENTAS HECHAS POR EL USUARIO SON IGUAL O MAYOR A LA META DE VENTAS PARA ESA MARCA
+                  // SI SI ES IGUAL O MAYOR AGREGA UN ATRIBUTO A ESA MARCA LLAMADO META Y LO CAMBIA A TRUE
+                  if(newArray[f].marcaPuntosVentas[b].puntosUsuario >= newArray[f].marcaPuntosVentas[b].puntosVentas){
+                    newArray[f].marcaPuntosVentas[b].meta = true
+                  }
+                  // SI LA META ES MAYOR A LAS VENTAS EL ATRIBUTO META ES FALSE
+                  else if(newArray[f].marcaPuntosVentas[b].puntosUsuario < newArray[f].marcaPuntosVentas[b].puntosVentas){
+                    newArray[f].marcaPuntosVentas[b].meta = false
+                  }
+                }
+                // DESPUES VEMOS CUANTOS TRUE HAY EN LAS MARCAS, SI LA CANTIDAD DE TRUES ES IGUAL A LA CANTIDAD DE MARCAS
+                // SIGNIFICA QUE TODAS LAS MARCAS HAN CUMPLIDO CON SU META DE VENTAS, LO CUAL SIGNIFICA QUE TENEMOS QUE ACTIVAR EL BOTON DE 
+                // RECLAMAR PREMIO
+                if(newArray[f].marcaPuntosVentas[b].meta === true){
+                  newArray[f].ventasTotales += 1
+                  if(newArray[f].ventasTotales  === newArray[f].marcaPuntosVentas.length ) newArray[f].ganador = true;
+                }
+              }
+            }
+      // HASTA AQUI newArray LLEVA LAS DINAMICAS UNICAS JUNTO CON LAS VENTAS QUE LE 
+      //CORRESPONDE A CADA UNA Y TAMBIEN YA VAN SUMADAS ESAS VENTAS POR PRODUCTO.
+            this.handleOpen5();
+            this.setState({newArray,algo})
+    })
+    .catch(e=>console.log(e))
+  }
+  // SINO ES UNA DINAMICA DE MODALIDAD VENTASPUES SE EJECUTA ESTA FUNCION QUE NO HACE NADA
+  getMyPoints = () =>{
+    let {newCreadores} = this.state;
+    let id = `${JSON.parse(localStorage.getItem('user'))._id}`;
+    for(let i = 0; i<newCreadores.length; i++){
+      if(newCreadores[i]._id === id){
+        this.setState({miDetalle:newCreadores[i].marcas})
+      }
+    }
+    this.handleOpen()
+  }
+    // FUNCION QUE PERMITE AL USUARIO HACERSE UN GANADOR DE LA DINAMICA, ESTE BOTON Y ESTA FUNCION SOLO DEBERIA DE VERSE CUANDO UN 
+  // USUARIO HA LOGRADO LAS METAS DE VENTAS DE LA DINAMICA CORRESPONDIENTE
+  oneWinner = (dinamic) => {
+    let idDinamica = dinamic._id;
+    dinamic.winner = `${JSON.parse(localStorage.getItem('user'))._id}`;
+    this.handleClose5()
+    sendWinner(dinamic,idDinamica)
+    .then(dinamic=>{
+      this.setState({open6:true})
+    })
+    .catch(e=>console.log(e))
+  } 
   
   render(){
-    const {dinamic, marcas,marcaDetalle,newCreadores,verRanking,puntos} = this.state;
+    const {dinamic, marcas,marcaDetalle,newCreadores,verRanking,puntos,newArray,miDetalle} = this.state;
     const actions2 = [
       <RaisedButton 
               onClick={this.refreshPage}  
@@ -220,6 +361,22 @@ class DinamicDetail extends Component{
               labelColor="#FAFAFA"
             />
     ];
+    const actions = [
+      <FlatButton
+        label="Entendido"
+        primary={true}
+        keyboardFocused={true}
+        onClick={this.handleClose6}
+      />,
+    ];
+    const actions3 = [
+      <FlatButton
+        label="Entendido"
+        primary={true}
+        keyboardFocused={true}
+        onClick={this.handleClose5}
+      />
+    ]
       return (
         <div>
           <TabSup />
@@ -239,7 +396,14 @@ class DinamicDetail extends Component{
               title={dinamic.modalidad} 
               
             />
-            <h5 className="puntajePorDinamica">{dinamic.modalidad === "Ventas" ? 'Ventas: ' + puntos  : ' Puntos: ' + puntos}</h5>
+            <div  className="puntajePorDinamica">
+              <RaisedButton 
+              onClick={dinamic.modalidad === "Ventas" ? this.getMySolds : this.getMyPoints}  
+              label={dinamic.modalidad === "Ventas" ? 'Mis Ventas: ' + puntos  : 'Mis Puntos: ' + puntos} 
+              backgroundColor="#004D40"
+              labelColor="#FAFAFA"
+            />
+            </div>
             <hr/>
             <b>{dinamic.modalidad === "Ventas" ? "Ventas requeridas por marca: " : "Puntos por unidad vendida: "}</b>     
             <br/><br/>
@@ -345,6 +509,88 @@ class DinamicDetail extends Component{
               </div>      
         </Dialog> 
         </div>
+        <div>
+        <Dialog
+          modal={false}
+          open={this.state.open5}
+          actions={actions3}
+          onRequestClose={this.handleClose5}
+          contentStyle={customContentStyle}
+          autoScrollBodyContent={true}
+        >
+        <div>
+          {newArray[0] ? newArray.map((dinamic)=>(
+             <div key={dinamic._id}>
+               <Avatar
+                src={dinamic.imagenPremio}
+                size={90}
+                style={style2}
+              />
+              <h5>{dinamic.nombreDinamica}</h5>
+              <h6 className="ache6">Tus Ventas Logradas: </h6> {dinamic.marcaPuntosVentas.sort((a, b) => b.puntosUsuario - a.puntosUsuario ).map((marca,index)=>(
+                <div className="ventas" key={index}>
+                <hr/>
+                <Chip
+                className="dinamicDetailHijo"
+                >
+                <Avatar src={marca.foto} />
+                  {marca.nombre}
+                </Chip>
+                <br/> 
+                <br/> 
+                <p>Meta de Ventas: <big>{marca.puntosVentas}</big> </p>
+                <p>Ventas Logradas: <big className="bigVentas">{marca.puntosUsuario}</big> </p>
+                <hr/>
+                </div>
+              ))}
+              <div className="buttonVentas">
+              <button style={dinamic.ganador === true ? {display:"block"} : {display:"none"} } onClick={() => this.oneWinner(dinamic)}>Reclamar premio</button>
+              </div>
+             </div>
+          )) : 
+          <div>
+            <h5>Parece que aún no has hecho ventas en esta dinámica o ya las has canjeado por el premio correspondiente.</h5>
+          </div>} 
+          </div>     
+        </Dialog> 
+        </div>
+        <div>
+          <Dialog
+          title="¡GANASTE!"
+          actions={actions}
+          modal={false}
+          open={this.state.open6}
+          onRequestClose={this.handleClose6}
+        >
+          ¡¡¡Felicidades!!! Eres un GANADOR de esta dinámica, en breve se comunicaran contigo via 
+          correo electrónico para la entrega de tu PREMIO.
+        </Dialog>
+          </div>
+          <div>
+          <Dialog
+          title="Mi Desempeño:"
+          modal={false}
+          open={this.state.open}
+          onRequestClose={this.handleClose}
+          autoScrollBodyContent={true}
+          contentStyle={customContentStyle}
+        >
+        {miDetalle[0] ? miDetalle.map( (marca, index) => (
+              <div key={index}>
+              <Chip
+              >
+              <Avatar src={marca._id.imagen} />
+                <span>{marca._id.nombre} </span> 
+                 <b>{marca.puntosUsuario + " ventas" }</b> 
+              </Chip> 
+              <br/>
+              </div>
+              )) : <div>
+                    <b>Aún no has registrado ventas</b>
+                   </div>
+              }
+        </Dialog>
+          </div>
       </div>
       );
     }

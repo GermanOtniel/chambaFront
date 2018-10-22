@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import TabSup from '../Profile/TabSup';
 import Dialog from 'material-ui/Dialog';
 import Paper from 'material-ui/Paper';
+import FontIcon from 'material-ui/FontIcon';
 import FlatButton from 'material-ui/FlatButton';
 import { getNotas } from '../../services/notas';
 import './notas.css';
@@ -78,10 +79,11 @@ goToMenu = () => {
           <TabSup />
           </div>
           <div className="padreProfile">
-            <span className="mensajes">Mensajes</span>
+          <div className="h5EnviarEvi">
+          <FontIcon className="material-icons icon">sentiment_very_dissatisfied</FontIcon>
+          <h5>Evidencias Rechazadas</h5>
           </div>
-
-          <div className="padreProfile">
+          <hr/>
           {notas.map((nota)=>(
             <div  key={nota._id}>
             <Paper>

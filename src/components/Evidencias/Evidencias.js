@@ -4,6 +4,7 @@ import Dialog from 'material-ui/Dialog';
 import Paper from 'material-ui/Paper';
 import { getEvidencesByUser } from '../../services/evidencias';
 import TabSup from '../Profile/TabSup';
+import FontIcon from 'material-ui/FontIcon';
 import FlatButton from 'material-ui/FlatButton';
 import Chip from 'material-ui/Chip';
 import './evidencias.css';
@@ -57,8 +58,12 @@ class Evidencias extends Component{
         <div>
         <TabSup />
         <div className="padreProfile">
-            <span className="mensajes">Evidencias</span>
-          </div>
+          <div className="h5EnviarEvi">
+            <FontIcon className="material-icons icon">device_unknown</FontIcon>
+            <h5>Evidencias Pendientes</h5>
+          </div> 
+          <hr/>      
+        </div>
         <div className="padreProfile">
           {evidencias.map((evidencia)=>(
             <div  key={evidencia._id}>

@@ -128,12 +128,12 @@ class TabSup extends Component{
       //#bc960b
       >
       <Tab
-        icon={<FontIcon className="material-icons">home</FontIcon>}
+        icon={<FontIcon className="material-icons">person</FontIcon>}
         label="Perfil"
         containerElement={<Link to={`/profile/${JSON.parse(localStorage.getItem('user'))._id}`}/>}
       />
       <Tab
-        icon={<FontIcon className="material-icons">notification_important</FontIcon>}
+        icon={<FontIcon className="material-icons">home</FontIcon>}
         label="Dinámicas"
         containerElement={<Link to="/dinamicas"/>}
       />
@@ -163,11 +163,11 @@ class TabSup extends Component{
               <img alt="Logo 1.5" width="150px" src="https://firebasestorage.googleapis.com/v0/b/filetest-210500.appspot.com/o/testing%2Flogo1.5.png?alt=media&token=3288401a-902f-4601-a984-e564365bd3ed"/>
             </div>
             </div> 
-          <div > 
+          {/* <div> 
             <div>
             <Link to="/ventas"><RaisedButton style={{height:50,marginTop:10}} labelColor="#FAFAFA" backgroundColor="#546E7A" label="MIS VENTAS" fullWidth={true}></RaisedButton></Link>
             </div>
-          </div> 
+          </div>  */}
           {/* <div className="menu-container"> 
             <div>
             <Link to="/dinamicas"><RaisedButton style={{height:50}} labelColor="#FAFAFA" backgroundColor="#546E7A" label="TICKETS" fullWidth={true}></RaisedButton></Link>
@@ -176,12 +176,12 @@ class TabSup extends Component{
           */} 
           <div > 
             <div>
-            <Link to="/mensajes"><RaisedButton style={{height:50,marginTop:10}} labelColor="#FAFAFA" backgroundColor="#546E7A" label="BUZÓN" fullWidth={true} ></RaisedButton></Link>
+            <Link to="/mensajes"><RaisedButton style={{height:50,marginTop:10}} labelColor="#FAFAFA" backgroundColor="#546E7A" label="RECHAZADAS" fullWidth={true} ></RaisedButton></Link>
             </div>
           </div> 
           <div > 
             <div>
-            <Link to="/evidencias"><RaisedButton style={{height:50,marginTop:10}} labelColor="#FAFAFA" backgroundColor="#546E7A" label="ENVIADAS" fullWidth={true} ></RaisedButton></Link>
+            <Link to="/evidencias"><RaisedButton style={{height:50,marginTop:10}} labelColor="#FAFAFA" backgroundColor="#546E7A" label="PENDIENTES" fullWidth={true} ></RaisedButton></Link>
             </div>
           </div>  
           <div > 
