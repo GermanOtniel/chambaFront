@@ -7,6 +7,7 @@ import FlatButton from 'material-ui/FlatButton';
 import Dialog from 'material-ui/Dialog';
 import {Link} from 'react-router-dom';
 import { getDinamics } from '../../services/dinamicas';
+import { Mixpanel } from '../../mixpanel/mixpanel';
 
 
 const styles = {
@@ -74,6 +75,10 @@ class Dinamica extends Component{
  //ESTA FUNCION NOS LLEVA A UNA DINAMICA EN ESPECIAL Y MANDAMOS SU ID MEDIANTE LOS PARAMS
  dinamic=(dinamic)=>{
     this.props.history.push(`/dinamica/${dinamic._id}`);
+    Mixpanel.track('Click dinamic',{
+      "nombre": dinamic.nombreDinamica,
+      "$id":dinamic._id
+    })
  }
 
  // CUANDO NO HAY DINAMICAS O CENTRO DE CONSUMO EL BOTON QUE SE HABILITA EN EL DIALOGO INFORMATIVO LLEVA AL USUARIO A SU PERFIL

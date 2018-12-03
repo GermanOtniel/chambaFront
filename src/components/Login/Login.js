@@ -6,13 +6,13 @@ import Dialog from 'material-ui/Dialog';
 import TextField from 'material-ui/TextField';
 import RaisedButton from 'material-ui/RaisedButton';
 import { GoogleLogin } from 'react-google-login';
+import { Mixpanel } from '../../mixpanel/mixpanel';
 import './login.css'
 
 
 const customContentStyle = {
   width: '100%',
   maxWidth: 'none'
-  
 };
 
 class Login extends Component {
@@ -31,7 +31,7 @@ class Login extends Component {
   // lo que se hace es ver si hay un usuario guardado en el local storage, si si usamos esos datos para autocompletar 
   // el usuario y la contraseña para que el usuario no tenga necesidad de escribir nuevamente su contrasseña y correo
   componentWillMount(){
-    console.log('VAMONOS A LA VISITA!!!!')
+    console.log('HABILIDADES Y DOCUMENTOS!!!')
     let usuarioGuardado;
     let hayUsuario = `${JSON.parse(localStorage.getItem('userLogged'))}`;
     if ( hayUsuario === "null" ){
@@ -109,9 +109,11 @@ handleClose4 = () => {
     login(this.state.newUser)
     .then(user=>{
       this.props.history.push(`/profile/${user._id}`);
+      Mixpanel.track('Login Email & Password');
     })
     .catch(e=>{
       this.handleOpen()
+      Mixpanel.track('Fail Login Email & Password')
     })
   }
   // ESTA ES UNA FUNCION LA CUAL NOS INDICA SI OCURRE UN ERROR MIENTRAS EL USUARIO QUIERE INGRESAR CON 
@@ -133,9 +135,11 @@ handleClose4 = () => {
           .then(r=>{
             if(r === "NER"){
               this.handleOpen()
+              Mixpanel.track('Fail login with G');
             }
             else{
             this.props.history.push(`/profile/${user._id}`);
+            Mixpanel.track('Login with G');
             }
       })
       .catch(e=>console.log(e))

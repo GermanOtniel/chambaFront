@@ -51,16 +51,33 @@ class Evidencias extends Component{
     this.setState({marcasVentas, evidencia})
     this.handleOpen()
   }
+  // IR A EDITAR UNA EVIDENCIA
+  goToEditEvidence=()=>{
+    let {evidencia} = this.state;
+    this.props.history.push(`/editevidence/${evidencia._id}`)
+  }
 
   render(){
       const {evidencias,evidencia,marcasVentas} = this.state;
+      const actions = [
+        <FlatButton 
+          onClick={this.goToEditEvidence}  
+          label="Editar" 
+          primary={true}
+        />,
+        <FlatButton 
+        onClick={this.handleClose}  
+        label="Cerrar" 
+        primary={true}
+      />
+      ];
       return (
         <div>
         <TabSup />
         <div className="padreProfile">
           <div className="h5EnviarEvi">
-            <FontIcon className="material-icons icon">device_unknown</FontIcon>
-            <h5>Evidencias Pendientes</h5>
+            <FontIcon className="material-icons">device_unknown</FontIcon>
+            <h4>Evidencias Pendientes</h4>
           </div> 
           <hr/>      
         </div>
@@ -87,6 +104,7 @@ class Evidencias extends Component{
           <Dialog
           title="Detalle de evidencia: "
           modal={false}
+          actions={actions}
           open={this.state.open}
           onRequestClose={this.handleClose}
           autoScrollBodyContent={true}
@@ -94,7 +112,7 @@ class Evidencias extends Component{
         > 
           <h5 className="evidenciaStatus">{evidencia.status}</h5>
           <h6>Mensaje: </h6>
-          <span>{evidencia.mensaje}</span>
+          <span>{evidencia.mensaje ? evidencia.mensaje : "No enviaste mensaje"}</span>
           <br/>
           <span className="fechaEvidenciaRechazada">{"Enviaste esta evidencia el "+evidencia.created}</span>
           <hr/>
@@ -105,7 +123,7 @@ class Evidencias extends Component{
                 className="dinamicDetailHijo"
                 >
                 <Avatar src={marca._id.imagen} />
-                  <span>{marca._id.nombre }</span><b>{" "+marca.ventas + " ventas" }</b>
+                  <span>{marca._id.nombre.length > 18 ?  marca._id.nombre.slice(0,16) + "... " : marca._id.nombre}</span><b>{" "+marca.ventas + " ventas" }</b>
                 </Chip>
                 <br/> 
                 </div>

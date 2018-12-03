@@ -9,6 +9,7 @@ import FontIcon from 'material-ui/FontIcon';
 import {changePassword} from '../../services/auth';
 import { Link } from 'react-router-dom';
 import './profile.css';
+import { Mixpanel } from '../../mixpanel/mixpanel';
 
 
 class TabSup extends Component{
@@ -102,7 +103,19 @@ class TabSup extends Component{
     })
     .catch(e=>console.log(e))
   }
-  
+
+  // MEDIR A TRAVES DE MIXPANEL 
+  academiaTeacheable=()=>{
+    let nombre = `${JSON.parse(localStorage.getItem('user')).nombre}`
+    let espacio = " ";
+    let apellido = `${JSON.parse(localStorage.getItem('user')).apellido}`
+    Mixpanel.track('Teacheable click',{
+      "who": nombre + espacio + apellido,
+      "whoID":`${JSON.parse(localStorage.getItem('user'))._id}`
+    })
+  }
+
+
   render(){
     const actions2 = [
       <FlatButton
@@ -176,22 +189,32 @@ class TabSup extends Component{
           */} 
           <div > 
             <div>
-            <Link to="/mensajes"><RaisedButton style={{height:50,marginTop:10}} labelColor="#FAFAFA" backgroundColor="#546E7A" label="RECHAZADAS" fullWidth={true} ></RaisedButton></Link>
+            <Link to="/mensajes"><RaisedButton style={{height:50,marginTop:3}} labelColor="#FAFAFA" backgroundColor="#546E7A" label="RECHAZADAS" fullWidth={true} ></RaisedButton></Link>
             </div>
           </div> 
           <div > 
             <div>
-            <Link to="/evidencias"><RaisedButton style={{height:50,marginTop:10}} labelColor="#FAFAFA" backgroundColor="#546E7A" label="PENDIENTES" fullWidth={true} ></RaisedButton></Link>
+            <Link to="/evidencias"><RaisedButton style={{height:50,marginTop:3}} labelColor="#FAFAFA" backgroundColor="#546E7A" label="PENDIENTES" fullWidth={true} ></RaisedButton></Link>
             </div>
           </div>  
           <div > 
             <div>
-            <RaisedButton href="https://15onzas.teachable.com/" style={{height:50,marginTop:10}} labelColor="#FAFAFA"	 backgroundColor="#546E7A" label="ACADEMIA 1.5" fullWidth={true} ></RaisedButton>
+            <RaisedButton onClick={this.academiaTeacheable} href="https://15onzas.teachable.com/" style={{height:50,marginTop:3}} labelColor="#FAFAFA"	 backgroundColor="#546E7A" label="ACADEMIA 1.5" fullWidth={true} ></RaisedButton>
             </div> 
           </div> 
           <div > 
             <div>
-            <RaisedButton onClick={this.changePassword} style={usuarioGmail ? {display:"none"} : {height:50,marginTop:10}} labelColor="#FAFAFA"	 backgroundColor="#546E7A" label="CAMBIAR CONTRASEÑA" fullWidth={true} ></RaisedButton>
+            <RaisedButton onClick={this.changePassword} style={usuarioGmail ? {display:"none"} : {height:50,marginTop:3}} labelColor="#FAFAFA"	 backgroundColor="#546E7A" label="CAMBIAR CONTRASEÑA" fullWidth={true} ></RaisedButton>
+            </div> 
+          </div> 
+          <div > 
+            <div>
+           <Link to="/habilities"><RaisedButton style={{height:50,marginTop:3}} labelColor="#FAFAFA" backgroundColor="#546E7A" label="MIS HABILIDADES" fullWidth={true} ></RaisedButton></Link>
+            </div> 
+          </div> 
+          <div > 
+            <div>
+           <Link to="/documents"><RaisedButton style={{height:50,marginTop:3}} labelColor="#FAFAFA" backgroundColor="#546E7A" label="MIS DOCUMENTOS" fullWidth={true} ></RaisedButton></Link>
             </div> 
           </div> 
           </div>

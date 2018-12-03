@@ -10,7 +10,9 @@ import Notas from './components/Mensajes/Notas';
 import Ventas from './components/Ventas/Ventas';
 import Evidencias from './components/Evidencias/Evidencias';
 import SendEvidence from './components/Dinamicas/SendEvidence';
-
+import EditEvidence from './components/Evidencias/EditEvidence';
+import Habilities from './components/Habilities/Habilities';
+import Documentos from './components/Documentos/Documentos';
 
 export const Routes = () => {
   return (
@@ -25,6 +27,9 @@ export const Routes = () => {
       <Route path="/mensajes" component={Notas}/>
       <Route path="/ventas" component={Ventas}/>
       <Route path="/evidencias" component={Evidencias}/>
+      <Route path="/habilities" component={Habilities}/>
+      <Route path="/documents" component={Documentos}/>
+      <Route path="/editevidence/:id" component={EditEvidence}/>
     </Switch>
   );
 }

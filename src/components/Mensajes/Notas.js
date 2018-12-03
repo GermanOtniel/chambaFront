@@ -70,9 +70,26 @@ goToDinamic = (nota) => {
 goToMenu = () => {
   this.props.history.push(`/dinamicas`)
 };
+  // IR A EDITAR UNA EVIDENCIA
+  goToEditEvidence=()=>{
+    let {nota} = this.state;
+    this.props.history.push(`/editevidence/${nota.evidenciaPertenece._id}`)
+  }
 
   render(){
     const {notas,nota} = this.state;
+    const actions = [
+      <FlatButton 
+      onClick={this.goToEditEvidence}  
+      label="Editar" 
+      primary={true}
+    />,
+    <FlatButton 
+    onClick={this.handleClose}  
+    label="Cerrar" 
+    primary={true}
+  />
+    ]
       return (
         <div>
           <div>
@@ -80,8 +97,8 @@ goToMenu = () => {
           </div>
           <div className="padreProfile">
           <div className="h5EnviarEvi">
-          <FontIcon className="material-icons icon">sentiment_very_dissatisfied</FontIcon>
-          <h5>Evidencias Rechazadas</h5>
+          <FontIcon className="material-icons">sentiment_very_dissatisfied</FontIcon>
+          <h4>Evidencias Rechazadas</h4>
           </div>
           <hr/>
           {notas.map((nota)=>(
@@ -110,9 +127,11 @@ goToMenu = () => {
           onRequestClose={this.handleClose}
           autoScrollBodyContent={true}
           className="padreProfile"
+          actions={actions}
         > 
           <h6>{nota.todos ? "Mensaje Global" : "Mensaje de la dinamica " + nota.din}</h6>
           <hr/>
+          <b>Mensaje: </b>
           <span>{nota.cuerpo}</span>
           <br/>
           <img alt="Imagen Nota" width="230" height="200" src={nota.pic2 ? nota.pic2 : "https://firebasestorage.googleapis.com/v0/b/filetest-210500.appspot.com/o/users%2Flogo15.jpg?alt=media&token=126df777-ff3c-4587-9188-0e4052b5cde1"}/>

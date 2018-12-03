@@ -13,6 +13,7 @@ import firebase from '../../firebase/firebase';
 import Avatar from 'material-ui/Avatar';
 import Chip from 'material-ui/Chip';
 import './dinamica.css';
+import { Mixpanel } from '../../mixpanel/mixpanel';
 
 
 const styles2 = {
@@ -80,6 +81,7 @@ class SendEvidence extends Component{
     marcaDetalle:{},
     boton:true,
     faltaImagen:true,
+    completa:true,
     open3:false,
     open4:false,
   }
@@ -104,6 +106,7 @@ class SendEvidence extends Component{
 // ESTA FUNCION GUARDA LAS FOTOS DE LAS EVIDENCIAS EN FIREBASE STORAGE E 
 // INSERTA EL LINK DE LA IMAGEN EN LOS DATOS QUE SE ENVIARAN COMO EVIDENCIA.
   getFile = e => {
+   let {dinamic,boton} = this.state;
    const file = e.target.files[0];
    const correo = `${JSON.parse(localStorage.getItem('user')).correo}`;
    const date = new Date();
@@ -111,9 +114,10 @@ class SendEvidence extends Component{
    const numberRandom = Math.random();
    const number = String(numberRandom).slice(2,16)
    const child = 'evidenceOf'+correo + date2 + number
+   const carpet = "evidenciasOrdenadas/" + dinamic.nombreDinamica
    //aqui lo declaro
    const uploadTask = firebase.storage()
-   .ref("evidencias")
+   .ref(carpet)
    .child(child)
    .put(file);
    //aqui agreggo el exito y el error
@@ -121,6 +125,9 @@ class SendEvidence extends Component{
    .then(r=>{
      const {evidencia} = this.state;
      evidencia.archivo =  r.downloadURL;
+     if(boton === false){
+      this.setState({completa:false})
+     }
      this.setState({evidencia,faltaImagen:false})
    })
    .catch(e=>console.log(e)) //task
@@ -157,12 +164,14 @@ class SendEvidence extends Component{
   onChangeEvidence = (e) => {
     const field = e.target.name;
     const value = e.target.value;
-    const {chipData} =this.state;
-    const {evidencia} = this.state;
+    const {chipData,evidencia,faltaImagen} = this.state;
     for(let i = 0; i<chipData.length;i++){
       if(field === chipData[i]._id._id){
         chipData[i].ventas = value
       }
+    }
+    if(faltaImagen === false){
+      this.setState({completa:false})
     }
     evidencia.marcas = chipData;
     this.setState({evidencia,chipData,boton:false})
@@ -186,6 +195,9 @@ class SendEvidence extends Component{
   // DESPUES DE TODOS ESTOS CAMBIOS SE CREA LA EVIDENICA ES DECIR SE MANDA A NUESTRO BACKEND PARA QUE SE CREE  
   sendEvidencia = (e) => {
     const {evidencia,dinamic} = this.state;
+    let nombre = `${JSON.parse(localStorage.getItem('user')).nombre}`;
+    let espacio = ' ';
+    let apellido = `${JSON.parse(localStorage.getItem('user')).apellido}`;
     let fecha = new Date()
     evidencia.fecha = String(fecha).slice(0,15)
     const idUser = `${JSON.parse(localStorage.getItem('user'))._id}`;
@@ -201,6 +213,11 @@ class SendEvidence extends Component{
     createEvidence(this.state.evidencia)
     .then(r=>{
       this.handleOpen3();
+      Mixpanel.track('Evidence created',{
+        "dinamicEvidence":dinamic.nombreDinamica,
+        "dateEvidenceCreated": new Date(),
+        "creator": nombre + espacio + apellido
+      })
     })
     .catch(e=>{
       this.handleOpen4()
@@ -307,7 +324,7 @@ backToDinamic = () =>{
             </div>
             <br/>
             <RaisedButton 
-              disabled={ dinamic.imagen ? this.state.faltaImagen : this.state.boton}
+              disabled={ dinamic.imagen ? this.state.completa : this.state.boton}
               onClick={this.sendEvidencia}  
               label="Enviar Evidencia" 
               backgroundColor="#B71C1C"

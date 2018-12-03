@@ -7,6 +7,7 @@ import Dialog from 'material-ui/Dialog';
 import RaisedButton from 'material-ui/RaisedButton';
 import TabSup from './TabSup';
 import FlatButton from 'material-ui/FlatButton';
+import { Mixpanel } from '../../mixpanel/mixpanel';
 import './profile.css';
 
 const style = {
@@ -41,7 +42,6 @@ class Profile extends Component{
 
     // TAMBIEN TRAEMOS TODOS LOS CENTROS QUE EXISTEN EN NUESTRA APP PARA QUE ELIJA ALGUNO DE ELLOS, COMO EL CENTRO DE CONSUMO EN EL QUE TRABAJA
   componentWillMount(){
-    let {open3} = this.state;
     const id = `${JSON.parse(localStorage.getItem('user'))._id}`;
     this.setState({id})
    getSingleUser(id)
@@ -57,13 +57,17 @@ class Profile extends Component{
       })
       .catch(e=>console.log(e))
     }
-    if (user.cuentaConfirmada === false ){
-      open3 = true
-      this.setState({open3})
-    }
     if(user.centroConsumo){
       user.centro = user.centroConsumo.nombre
     }
+    Mixpanel.identify(user._id);
+    Mixpanel.people.set({
+      "$id": user._id,
+      "venue":user.centro,
+      "nameUser":user.nombre + ' ' + user.apellido,
+      "$email": user.correo,    // only special properties need the $
+      "$last_login": new Date(),         // properties can be dates...          
+    });
     this.setState({user})
    })
    .catch(e=>console.log(e));
@@ -76,6 +80,9 @@ class Profile extends Component{
  };
  handleClose2 = () => {
   this.setState({open2: false});
+ };
+ handleOpen3 = () => {
+  this.setState({open3: true});
  };
  handleClose3 = () => {
   this.setState({open3: false});
@@ -102,6 +109,7 @@ class Profile extends Component{
     salir()
     .then(logoutUser=>{
       this.props.history.push("/");
+      Mixpanel.track('User Out')
     })
     .catch(e=>alert(e))
   }
@@ -114,7 +122,7 @@ class Profile extends Component{
     const {user} =this.state;
     const actions2 = [
       <FlatButton
-        label="Entendido"
+        label="Cerrar"
         primary={true}
         keyboardFocused={true}
         onClick={this.handleClose3}
@@ -156,12 +164,15 @@ class Profile extends Component{
     <Divider/>
     <span>Correo: </span> <br/> <b>{ user.correo }</b>
     <Divider/>      <br/>
-
-    <h6>Consulta tus puntos ó ventas en la dinámica correspondiente</h6>
+    <div className="padreProfile">
+      <h6>{user.cuentaConfirmada ? "Consulta tus puntos ó ventas en la dinámica correspondiente" : "Visita tu correo electrónico y confirma tu cuenta mediante el correo que te hemos mandado."}</h6>
+      <b onClick={this.handleOpen3} style={user.cuentaConfirmada ? {display:'none'} : {display:'inline',textDecorationLine:'underline',color:'rgb(61, 145, 255)'}}>No me llego el correo</b>
+    </div>
         <hr/>
         <div>
         {/* onClick={this.handleOpen} */}
         <RaisedButton onClick={this.goToEdit} label="Editar Perfil" backgroundColor="#546E7A" labelColor="#FAFAFA"  />
+        <br/><br/>
         </div>
         {/* <br/>
         <div>
@@ -169,15 +180,14 @@ class Profile extends Component{
         </div> */}
         <div>
           <Dialog
-          title="Confirma tu correo electrónico"
           modal={false}
           actions={actions2}
           open={this.state.open3}
           onRequestClose={this.handleClose3}
         >
-          Parece ser que aún no has confirmado tu dirección de correo electrónico.
+          ¿No te llego el correo de confirmación?
           <br/><br/>
-          <b>Te recomendamos visitar tu correo electrónico y seguir las instrucciones que te hemos mandado .</b>
+          <b>Da click en REENVIAR CORREO.</b>
         </Dialog>
           </div>
         {/* <div className="button">

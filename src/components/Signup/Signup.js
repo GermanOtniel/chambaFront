@@ -77,6 +77,32 @@ class Signup extends Component {
     if(newUser.correo !== undefined){
       if(newUser.correo.includes('@') && newUser.correo.includes('.')){
         newUser.correo = newUser.correo.toLowerCase()
+        newUser.habilidades = [{
+          "_id":null,
+          "limpieza": 5,
+          "puntualidad": 5,
+          "disciplinado": 5,
+          "colaborativo": 5
+        },
+        {
+          "_id": null,
+          "limpieza": 5,
+          "puntualidad": 5,
+          "disciplinado": 5,
+          "colaborativo": 5
+        },
+        {
+          "_id": null,
+          "limpieza": 5,
+          "puntualidad": 5,
+          "disciplinado": 5,
+          "colaborativo": 5
+        }]
+        newUser.documentos = {
+          "idOficial": "https://firebasestorage.googleapis.com/v0/b/filetest-210500.appspot.com/o/testing%2Fnoimagen.jpg?alt=media&token=ce3e9648-3740-465b-bc26-3318de70d4b0",
+          "actaNac": "https://firebasestorage.googleapis.com/v0/b/filetest-210500.appspot.com/o/testing%2Fnoimagen.jpg?alt=media&token=ce3e9648-3740-465b-bc26-3318de70d4b0",
+          "curp": "https://firebasestorage.googleapis.com/v0/b/filetest-210500.appspot.com/o/testing%2Fnoimagen.jpg?alt=media&token=ce3e9648-3740-465b-bc26-3318de70d4b0"
+      }
         signup(this.state.newUser)
         .then(r=>{
           if(r.message){

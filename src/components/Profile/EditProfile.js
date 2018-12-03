@@ -50,7 +50,7 @@ class EditProfile extends Component{
     id: null,
     newProfile:{},
     centers:[],
-    progresoImagen:0,
+    progresoImagen:0
   }
 
     // CUANDO SE MONTA EL COMPONENTE TRAEMOS AL USUARIO MEDIANTE SU ID, Y REVISAMOS, SI SU CUENTA NO ESTA CONFIRMADA Y 
@@ -115,7 +115,7 @@ class EditProfile extends Component{
   // SE ENVIA LOS CAMBIOS EDITADOS DE NUESTRO USUARIO AL BACKEND PARA QUE A SU VEZ SE GUARDE EN NUESTRA BASE DE DATOS
   sendEdit = (e) => {
     const id = this.state.id;
-    const newProfile = this.state.newProfile;
+    const {newProfile} = this.state;
     editProfile(newProfile,id)
     .then(user=>{
       localStorage.setItem('user', JSON.stringify(user))
@@ -133,16 +133,31 @@ class EditProfile extends Component{
     <div>
       {/* <h4>Editar Perfil</h4> */}
       <img className="imgEditProf" src="https://firebasestorage.googleapis.com/v0/b/filetest-210500.appspot.com/o/testing%2Flogo1.5.png?alt=media&token=3288401a-902f-4601-a984-e564365bd3ed" alt="Loguito"/>
-      <hr/>
+      <hr style={{marginBottom:'-6px'}}/>
+      <FontIcon className="material-icons icon">store_mall_directory</FontIcon>
+        <AutoComplete
+          floatingLabelText="Elige tu Centro de Consumo"
+          hintText="en el que trabajas"
+          hintStyle={styles.hintText}
+          filter={AutoComplete.caseInsensitiveFilter}
+          dataSource={this.state.centers.map(centro => centro)}
+          dataSourceConfig={ {text: 'nombre', value: '_id'}  }
+          onNewRequest={this.onNewRequest}
+          floatingLabelStyle={styles.floatingLabelFocusStyle}
+          floatingLabelFocusStyle={styles.floatingLabelFocusStyle}
+        /> 
+      <Divider/><br/>
+    </div>
+    <div>
     <FontIcon className="material-icons icon">tag_faces</FontIcon>
-    <TextField 
-      onChange={this.onChange} 
-      name="nombreUsuario" 
-      hintStyle={styles.hintText}
-      hintText="Nombre de Usuario" 
-      type="text"  
-      underlineShow={true} 
-    />
+      <TextField 
+        onChange={this.onChange} 
+        name="nombreUsuario" 
+        hintStyle={styles.hintText}
+        hintText="Nombre de Usuario" 
+        type="text"  
+        underlineShow={true} 
+      />
     <Divider/><br/>
     </div>
     <div>
@@ -169,22 +184,7 @@ class EditProfile extends Component{
     />
     <Divider/>
     </div>
-    <div>
-    <FontIcon className="material-icons icon">store_mall_directory</FontIcon>
-    <AutoComplete
-      floatingLabelText="Elige tu Centro de Consumo"
-      hintText="en el que trabajas"
-      hintStyle={styles.hintText}
-      filter={AutoComplete.caseInsensitiveFilter}
-      dataSource={this.state.centers.map(centro => centro)}
-      dataSourceConfig={ {text: 'nombre', value: '_id'}  }
-      onNewRequest={this.onNewRequest}
-      floatingLabelStyle={styles.floatingLabelFocusStyle}
-      floatingLabelFocusStyle={styles.floatingLabelFocusStyle}
-    /> 
-    <br/>
-    <Divider/>
-    </div>
+
     <div>
     <FontIcon className="material-icons icon">phonelink_ring</FontIcon>
     <TextField 

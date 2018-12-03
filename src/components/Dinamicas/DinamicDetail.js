@@ -11,6 +11,7 @@ import RaisedButton from 'material-ui/RaisedButton';
 import Avatar from 'material-ui/Avatar';
 import Chip from 'material-ui/Chip';
 import './dinamica.css';
+import { Mixpanel } from '../../mixpanel/mixpanel';
 
 const styles = {
   noRoot:{
@@ -240,6 +241,7 @@ class DinamicDetail extends Component{
   goToSendEvidence = () =>{
     let {dinamic} = this.state;
     this.props.history.push(`/sendevi/${dinamic._id}`)
+    Mixpanel.track('Go to Send Evidence')
   }
 
   // TRAER EL PERFORMANCE DE ESA DINAMICA DE UN USUARIO SIEMPR EY CUANDO SEA 

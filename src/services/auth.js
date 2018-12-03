@@ -1,7 +1,7 @@
 //production 
-const baseURL = process.env.REACT_APP_BASE_URL;
+//const baseURL = process.env.REACT_APP_BASE_URL;
 // development
-//const baseURL = "http://localhost:3000"
+const baseURL = "http://localhost:3000"
 
 export function googleUser(userData){
     return fetch(baseURL + '/auth/google', {
@@ -55,8 +55,6 @@ export function signup(userData){
     });
 }
 export function login(userData){
-  //  localhost 
-  // herokuapp  '/auth/login'
     return fetch( baseURL + '/auth/login' ,{
       method:'post',
       headers:{
@@ -99,9 +97,6 @@ export function getSingleUser(id){
 }
 
 export function editProfile(formulario,id){
-  //console.log("peticion");
-  // localhost  
-  // herokuapp '/auth/profile'
   return fetch(  baseURL + '/auth/profile/' + id ,{
     method:'post',
     headers:{

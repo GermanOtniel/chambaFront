@@ -5,6 +5,7 @@
   "dependencies": {
     "firebase": "^3.0.0",
     "material-ui": "^0.20.1",
+    "mixpanel-browser": "^2.23.0",
     "react": "^16.4.1",
     "react-dom": "^16.4.1",
     "react-google-login": "^3.2.1",

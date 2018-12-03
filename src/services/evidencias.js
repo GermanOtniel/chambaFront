@@ -1,7 +1,8 @@
 //production 
-const baseURL = process.env.REACT_APP_BASE_URL;
+//const baseURL = process.env.REACT_APP_BASE_URL;
 // development
-//const baseURL = "http://localhost:3000"
+const baseURL = "http://localhost:3000"
+
 export function createEvidence(evidence){
     return fetch(baseURL + '/evidencia/new', {
         method:'post',
@@ -35,5 +36,31 @@ export function getEvidencesByUser(user){
     .then(r=>r.json())
     .then(evidencias=>{
       return evidencias
+    })
+  }
+
+  export function getSingleEvidence(id) {
+    return fetch( baseURL + '/evidencia/' + id)
+    .then(r=>r.json())
+    .then(evidencia=>{
+      return evidencia
+    })
+  }
+
+  export function editEvidence(evidencia,id){
+    return fetch(  baseURL + '/evidencia/edit/' + id ,{
+      method:'post',
+      headers:{
+          "Content-Type": "application/json"
+      },
+      body: JSON.stringify(evidencia),
+      credentials:"include"
+  })
+    .then(res=>{
+      if(!res.ok) return Promise.reject(res.statusText);
+      return res.json()
+    })
+    .then(evidence=>{
+      return evidence
     })
   }
